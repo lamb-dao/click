@@ -1,0 +1,1907 @@
+* CLICK
+  Common Lisp Interactive Control Kit
+  This is a WIP
+
+  - Purpose
+    - CLICK answers the question: what 20%  does 80% of the work?
+      - concepts
+      - operations
+      - packages
+    - CLICK serves as an on ramp to CL concepts by assuming prior linux and programming knowledge
+      - Setup, discovery and productivity is a significant hinderance, but only initially.
+      - Getting over this bump to the good stuff of Common Lisp should be made butttery smooth, its worth it.
+    - CLICK butters daily tasks, such that the REPL becomes substantially easier than terminal
+      - So that projects can begin in the REPL and then grow into their potential
+      - To prevent the all to common nightmare where a quick-experiment in bash becomes a monster
+      - Assumes that users begin with bash knowledge
+
+  - Future Contents
+    - readme with basic linux operations especially notes on paths/dirs/files/fileio
+    - basic package import and common usage reference
+      - these will be opinionated selections of the single best modern approach
+    - shell command wrappers for basic ops
+    - a few helper functions for finding and printing and help discovery
+    - everything you need in the first full week of using CL
+    - anything you need everyday
+
+      CLICK is not meant to be a comprehensive introduction, or the ultimate
+      library. It is opinionated selections and most used examples that get
+      me productive and learning through use. I Love the sprawling options and
+      obscure tools that common lisp provides, but a focused on-boarding would
+      have helped me immensely in my first year.
+
+* Startup
+Nice and basic intro to the syntax
+https://lisp-lang.org/
+
+Selected reference material, by example
+https://lamberta.github.io/minispec/
+
+** SBCL
+https://www.sbcl.org/
+TODO install guide
+https://lisp-lang.org/learn/getting-started/
+** lem
+https://github.com/lem-project/lem/
+TODO install guide
+** quicklisp and ultralisp
+https://www.quicklisp.org/beta/
+https://ultralisp.org/
+TODO install guide
+
+** pull this package
+
+TODO upload to ultralisp
+#+begin_src lisp
+  (ql:quickload :click)
+  (usepackage :click)
+#+end_src
+
+This will have to be loaded manually for now&&&
+
+* Shell Operations
+Standard shell commands should be native
+anybody with programming/bash experience would be immediately at home.
+These can be simple wrappers, the goal is to eventually have them all in portable
+common lisp, and have each doc-string describe the canonical CL approach
+
+** Bash
+*** Planned
+1. rm
+2. cp
+3. mv
+4. touch
+5. chmod
+6. chown
+7. sudo
+8. man
+9. find
+10. tar
+11. gzip
+12. ssh
+13. scp
+14. ps
+15. top
+16. kill
+17. df
+18. du
+19. ping
+20. ifconfig
+21. wget
+22. curl
+23. history
+24. clear
+25. alias
+26. whoami
+27. uname
+28. date
+29. time
+30. less
+31. head
+32. tail
+33. diff
+34. sort
+35. uniq
+36. wc
+37. cut
+38. sed
+39. awk
+40. xargs
+*** Implemented
+The command is implemented to provide simple function
+It may be a wrapper, its limitations should be noted in docstring
+
+1. pwd
+2. ls
+3. cd
+4. cat
+5. grep
+6. which
+7. echo
+8. mkdir
+9. rmdir
+
+*** Portable Cannonical
+The command is not a wrapper, its function is implemented in CL
+*** Docstring is educative
+The docstring educates the user on cannonical CL approaches
+the convenience commands should
+** Nushell
+*** command list
+alias	core
+	Alias a command (with optional flags) to a new name.
+all	filters
+	Test if every element of the input fulfills a predicate expression.
+ansi	platform
+	Output ANSI codes to change color and style of text.
+ansi gradient	platform
+	Add a color gradient (using ANSI color codes) to the given string.
+ansi link	platform
+	Add a link (using OSC 8 escape sequence) to the given string.
+ansi strip	platform
+	Strip ANSI escape sequences from a string.
+any	filters
+	Tests if any element of the input fulfills a predicate expression.
+append	filters
+	Append any number of rows to a table.
+ast	debug
+	Print the abstract syntax tree (ast) for a pipeline.
+banner	default
+	Print a banner for nushell with information about the project
+bits	bits
+	Various commands for working with bits.
+bits and	bits
+	Performs bitwise and for ints or binary values.
+bits not	bits
+	Performs logical negation on each bit.
+bits or	bits
+	Performs bitwise or for ints or binary values.
+bits rol	bits
+	Bitwise rotate left for ints or binary values.
+bits ror	bits
+	Bitwise rotate right for ints or binary values.
+bits shl	bits
+	Bitwise shift left for ints or binary values.
+bits shr	bits
+	Bitwise shift right for ints or binary values.
+bits xor	bits
+	Performs bitwise xor for ints or binary values.
+break	core
+	Break a loop.
+bytes	bytes
+	Various commands for working with byte data.
+bytes add	bytes
+	Add specified bytes to the input.
+bytes at	bytes
+	Get bytes defined by a range.
+bytes build	bytes
+	Create bytes from the arguments.
+bytes collect	bytes
+	Concatenate multiple binary into a single binary, with an optional separator between each.
+bytes ends-with	bytes
+	Check if bytes ends with a pattern.
+bytes index-of	bytes
+	Returns start index of first occurrence of pattern in bytes, or -1 if no match.
+bytes length	bytes
+	Output the length of any bytes in the pipeline.
+bytes remove	bytes
+	Remove bytes.
+bytes replace	bytes
+	Find and replace binary.
+bytes reverse	bytes
+	Reverse the bytes in the pipeline.
+bytes starts-with	bytes
+	Check if bytes starts with a pattern.
+cal	generators
+	Display a calendar.
+cd	filesystem
+	Change directory.
+char	strings
+	Output special characters (e.g., 'newline').
+chunks	filters
+	Divide a list or table into chunks of `chunk_size`.
+clear	platform
+	Clear the terminal.
+collect	filters
+	Collect a stream into a value.
+columns	filters
+	Given a record or table, produce a list of its columns' names.
+commandline	core
+	View the current command line input buffer.
+commandline edit	core
+	Modify the current command line input buffer.
+commandline get-cursor	core
+	Get the current cursor position.
+commandline set-cursor	core
+	Set the current cursor position.
+compact	filters
+	Creates a table with non-empty rows.
+complete	system
+	Capture the outputs and exit code from an external piped in command in a nushell table.
+config	env
+	Edit nushell configuration files.
+config env	env
+	Edit nu environment configurations.
+config nu	env
+	Edit nu configurations.
+config reset	env
+	Reset nushell environment configurations to default, and saves old config files in the config location as oldconfig.nu and oldenv.nu.
+const	core
+	Create a parse-time constant.
+continue	core
+	Continue a loop from the next iteration.
+cp	filesystem
+	Copy files using uutils/coreutils cp.
+date	date
+	Date-related commands.
+date format	removed
+	Removed command: use `format date` instead.
+date humanize	date
+	Print a 'humanized' format for the date, relative to now.
+date list-timezone	date
+	List supported time zones.
+date now	date
+	Get the current date.
+date to-record	date
+	Convert the date into a record.
+date to-table	date
+	Convert the date into a structured table.
+date to-timezone	date
+	Convert a date to a given time zone.
+debug	debug
+	Debug print the value(s) piped in.
+debug info	debug
+	View process memory info.
+debug profile	debug
+	Profile pipeline elements in a closure.
+decode	strings
+	Decode bytes into a string.
+decode base32	formats
+	Decode a Base32 value.
+decode base32hex	formats
+	Encode a base32hex value.
+decode base64	formats
+	Decode a Base64 value.
+decode hex	formats
+	Hex decode a value.
+def	core
+	Define a custom command.
+default	filters
+	Sets a default value if a row's column is missing or null.
+describe	core
+	Describe the type and structure of the value(s) piped in.
+detect columns	strings
+	Attempt to automatically split text into multiple columns.
+do	core
+	Run a closure, providing it with the pipeline input.
+drop	filters
+	Remove items/rows from the end of the input list/table. Counterpart of `skip`. Opposite of `last`.
+drop column	filters
+	Remove N columns at the right-hand end of the input table. To remove columns by name, use `reject`.
+drop nth	filters
+	Drop the selected rows.
+du	filesystem
+	Find disk usage sizes of specified items.
+each	filters
+	Run a closure on each row of the input list, creating a new list with the results.
+each while	filters
+	Run a closure on each row of the input list until a null is found, then create a new list with the results.
+echo	core
+	Returns its arguments, ignoring the piped-in value.
+encode	strings
+	Encode a string into bytes.
+encode base32	formats
+	Encode a string or binary value using Base32.
+encode base32hex	formats
+	Encode a binary value or a string using base32hex.
+encode base64	formats
+	Encode a string or binary value using Base64.
+encode hex	formats
+	Hex encode a binary value or a string.
+enumerate	filters
+	Enumerate the elements in a stream.
+error make	core
+	Create an error.
+every	filters
+	Show (or skip) every n-th row, starting from the first one.
+exec	system
+	Execute a command, replacing or exiting the current process, depending on platform.
+exit	shells
+	Exit Nu.
+explain	debug
+	Explain closure contents.
+explore	viewers
+	Explore acts as a table pager, just like `less` does for text.
+export	core
+	Export definitions or environment variables from a module.
+export alias	core
+	Alias a command (with optional flags) to a new name and export it from a module.
+export const	core
+	Use parse-time constant from a module and export them from this module.
+export def	core
+	Define a custom command and export it from a module.
+export extern	core
+	Define an extern and export it from a module.
+export module	core
+	Export a custom module from a module.
+export use	core
+	Use definitions from a module and export them from this module.
+export-env	env
+	Run a block and preserve its environment in a current scope.
+extern	core
+	Define a signature for an external command.
+fill	conversions
+	Fill and Align.
+filter	filters
+	Filter values based on a predicate closure.
+find	filters
+	Searches terms in the input.
+first	filters
+	Return only the first several rows of the input. Counterpart of `last`. Opposite of `skip`.
+flatten	filters
+	Flatten the table.
+fmt	conversions
+	Format a number.
+for	core
+	Loop over a range.
+format	strings
+	Various commands for formatting data.
+format date	strings
+	Format a given date using a format string.
+format duration	strings
+	Outputs duration with a specified unit of time.
+format filesize	strings
+	Converts a column of filesizes to some specified format.
+format pattern	strings
+	Format columns into a string using a simple pattern.
+from	formats
+	Parse a string or binary data into structured data.
+from csv	formats
+	Parse text as .csv and create table.
+from eml	formats
+	Parse text as .eml and create record.
+from ics	formats
+	Parse text as .ics and create table.
+from ini	formats
+	Parse text as .ini and create table.
+from json	formats
+	Convert from json to structured data.
+from msgpack	formats
+	Convert MessagePack data into Nu values.
+from msgpackz	formats
+	Convert brotli-compressed MessagePack data into Nu values.
+from nuon	formats
+	Convert from nuon to structured data.
+from ods	formats
+	Parse OpenDocument Spreadsheet(.ods) data and create table.
+from plist	formats
+	Convert plist to Nushell values
+from ssv	formats
+	Parse text as space-separated values and create a table. The default minimum number of spaces counted as a separator is 2.
+from toml	formats
+	Parse text as .toml and create record.
+from tsv	formats
+	Parse text as .tsv and create table.
+from url	formats
+	Parse url-encoded string as a record.
+from vcf	formats
+	Parse text as .vcf and create table.
+from xlsx	formats
+	Parse binary Excel(.xlsx) data and create table.
+from xml	formats
+	Parse text as .xml and create record.
+from yaml	formats
+	Parse text as .yaml/.yml and create table.
+from yml	formats
+	Parse text as .yaml/.yml and create table.
+generate	generators
+	Generate a list of values by successively invoking a closure.
+get	filters
+	Extract data using a cell path.
+glob	filesystem
+	Creates a list of files and/or folders based on the glob pattern provided.
+grid	viewers
+	Renders the output to a textual terminal grid.
+group-by	filters
+	Splits a list or table into groups, and returns a record containing those groups.
+gstat	prompt
+	Get the git status of a repo
+hash	hash
+	Apply hash function.
+hash md5	hash
+	Hash a value using the md5 hash algorithm.
+hash sha256	hash
+	Hash a value using the sha256 hash algorithm.
+headers	filters
+	Use the first row of the table as column names.
+help	core
+	Display help information about different parts of Nushell.
+help aliases	core
+	Show help on nushell aliases.
+help commands	core
+	Show help on nushell commands.
+help escapes	core
+	Show help on nushell string escapes.
+help externs	core
+	Show help on nushell externs.
+help modules	core
+	Show help on nushell modules.
+help operators	core
+	Show help on nushell operators.
+hide	core
+	Hide definitions in the current scope.
+hide-env	core
+	Hide environment variables in the current scope.
+histogram	chart
+	Creates a new table with a histogram based on the column name passed in.
+history	history
+	Get the command history.
+history session	history
+	Get the command history session.
+http	network
+	Various commands for working with http methods.
+http delete	network
+	Delete the specified resource.
+http get	network
+	Fetch the contents from a URL.
+http head	network
+	Get the headers from a URL.
+http options	network
+	Requests permitted communication options for a given URL.
+http patch	network
+	Patch a body to a URL.
+http post	network
+	Post a body to a URL.
+http put	network
+	Put a body to a URL.
+if	core
+	Conditionally run a block.
+ignore	core
+	Ignore the output of the previous command in the pipeline.
+inc	default
+	Increment a value or version. Optionally use the column of a table.
+input	platform
+	Get input from the user.
+input list	platform
+	Interactive list selection.
+input listen	platform
+	Listen for user interface event.
+insert	filters
+	Insert a new column, using an expression or closure to create each row's values.
+inspect	debug
+	Inspect pipeline results while running a pipeline.
+interleave	filters
+	Read multiple streams in parallel and combine them into one stream.
+into	conversions
+	Commands to convert data from one type to another.
+into binary	conversions
+	Convert value to a binary primitive.
+into bits	conversions
+	Convert value to a binary primitive.
+into bool	conversions
+	Convert value to boolean.
+into cell-path	conversions
+	Convert value to a cell-path.
+into datetime	conversions
+	Convert text or timestamp into a datetime.
+into duration	conversions
+	Convert value to duration.
+into filesize	conversions
+	Convert value to filesize.
+into float	conversions
+	Convert data into floating point number.
+into glob	conversions
+	Convert value to glob.
+into int	conversions
+	Convert value to integer.
+into record	conversions
+	Convert value to record.
+into sqlite	conversions
+	Convert table into a SQLite database.
+into string	conversions
+	Convert value to string.
+into value	filters
+	Infer Nushell datatype for each cell.
+is-admin	core
+	Check if nushell is running with administrator or root privileges.
+is-empty	filters
+	Check for empty values.
+is-not-empty	filters
+	Check for non-empty values.
+is-terminal	platform
+	Check if stdin, stdout, or stderr is a terminal.
+items	filters
+	Given a record, iterate on each pair of column name and associated value.
+join	filters
+	Join two tables.
+keybindings	platform
+	Keybindings related commands.
+keybindings default	platform
+	List default keybindings.
+keybindings list	platform
+	List available options that can be used to create keybindings.
+keybindings listen	platform
+	Get input from the user.
+kill	platform
+	Kill a process using the process id.
+last	filters
+	Return only the last several rows of the input. Counterpart of `first`. Opposite of `drop`.
+length	filters
+	Count the number of items in an input list or rows in a table.
+let	core
+	Create a variable and give it a value.
+let-env	removed
+	`let-env FOO = ...` has been removed, use `$env.FOO = ...` instead.
+lines	filters
+	Converts input to lines.
+load-env	filesystem
+	Loads an environment update from a record.
+loop	core
+	Run a block in a loop.
+ls	filesystem
+	List the filenames, sizes, and modification times of items in a directory.
+match	core
+	Conditionally run a block on a matched value.
+math	math
+	Use mathematical functions as aggregate functions on a list of numbers or tables.
+math abs	math
+	Returns the absolute value of a number.
+math arccos	math
+	Returns the arccosine of the number.
+math arccosh	math
+	Returns the inverse of the hyperbolic cosine function.
+math arcsin	math
+	Returns the arcsine of the number.
+math arcsinh	math
+	Returns the inverse of the hyperbolic sine function.
+math arctan	math
+	Returns the arctangent of the number.
+math arctanh	math
+	Returns the inverse of the hyperbolic tangent function.
+math avg	math
+	Returns the average of a list of numbers.
+math ceil	math
+	Returns the ceil of a number (smallest integer greater than or equal to that number).
+math cos	math
+	Returns the cosine of the number.
+math cosh	math
+	Returns the hyperbolic cosine of the number.
+math exp	math
+	Returns e raised to the power of x.
+math floor	math
+	Returns the floor of a number (largest integer less than or equal to that number).
+math ln	math
+	Returns the natural logarithm. Base: (math e).
+math log	math
+	Returns the logarithm for an arbitrary base.
+math max	math
+	Returns the maximum of a list of values, or of columns in a table.
+math median	math
+	Computes the median of a list of numbers.
+math min	math
+	Finds the minimum within a list of values or tables.
+math mode	math
+	Returns the most frequent element(s) from a list of numbers or tables.
+math product	math
+	Returns the product of a list of numbers or the products of each column of a table.
+math round	math
+	Returns the input number rounded to the specified precision.
+math sin	math
+	Returns the sine of the number.
+math sinh	math
+	Returns the hyperbolic sine of the number.
+math sqrt	math
+	Returns the square root of the input number.
+math stddev	math
+	Returns the standard deviation of a list of numbers, or of each column in a table.
+math sum	math
+	Returns the sum of a list of numbers or of each column in a table.
+math tan	math
+	Returns the tangent of the number.
+math tanh	math
+	Returns the hyperbolic tangent of the number.
+math variance	math
+	Returns the variance of a list of numbers or of each column in a table.
+merge	filters
+	Merge the input with a record or table, overwriting values in matching columns.
+metadata	debug
+	Get the metadata for items in the stream.
+metadata access	debug
+	Access the metadata for the input stream within a closure.
+metadata set	debug
+	Set the metadata for items in the stream.
+mkdir	filesystem
+	Create directories, with intermediary directories if required using uutils/coreutils mkdir.
+mktemp	filesystem
+	Create temporary files or directories using uutils/coreutils mktemp.
+module	core
+	Define a custom module.
+move	filters
+	Move columns before or after other columns.
+mut	core
+	Create a mutable variable and give it a value.
+mv	filesystem
+	Move files or directories using uutils/coreutils mv.
+nu-check	strings
+	Validate and parse input content.
+nu-highlight	strings
+	Syntax highlight the input string.
+open	filesystem
+	Load a file into a cell, converting to table if possible (avoid by appending '--raw').
+overlay	core
+	Commands for manipulating overlays.
+overlay hide	core
+	Hide an active overlay.
+overlay list	core
+	List all active overlays.
+overlay new	core
+	Create an empty overlay.
+overlay use	core
+	Use definitions from a module as an overlay.
+panic	debug
+	Causes nushell to panic.
+par-each	filters
+	Run a closure on each row of the input list in parallel, creating a new list with the results.
+parse	strings
+	Parse columns from string data using a simple pattern or a supplied regular expression.
+path	path
+	Explore and manipulate paths.
+path basename	path
+	Get the final component of a path.
+path dirname	path
+	Get the parent directory of a path.
+path exists	path
+	Check whether a path exists.
+path expand	path
+	Try to expand a path to its absolute form.
+path join	path
+	Join a structured path or a list of path parts.
+path parse	path
+	Convert a path into structured data.
+path relative-to	path
+	Express a path as relative to another path.
+path split	path
+	Split a path into a list based on the system's path separator.
+path type	path
+	Get the type of the object a path refers to (e.g., file, dir, symlink).
+plugin	plugin
+	Commands for managing plugins.
+plugin add	plugin
+	Add a plugin to the plugin registry file.
+plugin list	plugin
+	List installed plugins.
+plugin rm	plugin
+	Remove a plugin from the plugin registry file.
+plugin stop	plugin
+	Stop an installed plugin if it was running.
+plugin use	plugin
+	Load a plugin from the plugin registry file into scope.
+polars	dataframe
+	Operate with data in a dataframe format.
+polars agg	lazyframe
+	Performs a series of aggregations from a group-by.
+polars agg-groups	dataframe
+	Creates an agg_groups expression.
+polars all-false	dataframe
+	Returns true if all values are false.
+polars all-true	dataframe
+	Returns true if all values are true.
+polars append	dataframe
+	Appends a new dataframe.
+polars arg-max	dataframe
+	Return index for max value in series.
+polars arg-min	dataframe
+	Return index for min value in series.
+polars arg-sort	dataframe
+	Returns indexes for a sorted series.
+polars arg-true	dataframe
+	Returns indexes where values are true.
+polars arg-unique	dataframe
+	Returns indexes for unique values.
+polars arg-where	expression
+	Creates an expression that returns the arguments where expression is true.
+polars as	expression
+	Creates an alias expression.
+polars as-date	dataframe
+	Converts string to date.
+polars as-datetime	dataframe
+	Converts string to datetime.
+polars cache	dataframe
+	Caches operations in a new LazyFrame.
+polars cast	dataframe
+	Cast a column to a different dtype.
+polars col	expression
+	Creates a named column expression.
+polars collect	lazyframe
+	Collect lazy dataframe into eager dataframe.
+polars columns	dataframe
+	Show dataframe columns.
+polars concat	dataframe
+	Concatenate two or more dataframes.
+polars concat-str	expression
+	Creates a concat string expression.
+polars contains	dataframe
+	Checks if a pattern is contained in a string.
+polars count	dataframe
+	Returns the number of non-null values in the column.
+polars count-null	dataframe
+	Counts null values.
+polars cumulative	dataframe
+	Cumulative calculation for a column or series.
+polars datepart	expression
+	Creates an expression for capturing the specified datepart in a column.
+polars decimal	dataframe
+	Converts a string column into a decimal column
+polars drop	dataframe
+	Creates a new dataframe by dropping the selected columns.
+polars drop-duplicates	dataframe
+	Drops duplicate values in dataframe.
+polars drop-nulls	dataframe
+	Drops null values in dataframe.
+polars dummies	dataframe
+	Creates a new dataframe with dummy variables.
+polars explode	lazyframe
+	Explodes a dataframe or creates a explode expression.
+polars expr-not	dataframe
+	Creates a not expression.
+polars fetch	lazyframe
+	Collects the lazyframe to the selected rows.
+polars fill-nan	lazyframe
+	Replaces NaN values with the given expression.
+polars fill-null	lazyframe
+	Replaces NULL values with the given expression.
+polars filter	lazyframe
+	Filter dataframe based in expression.
+polars filter-with	dataframe or lazyframe
+	Filters dataframe using a mask or expression as reference.
+polars first	dataframe
+	Show only the first number of rows or create a first expression
+polars flatten	lazyframe
+	An alias for polars explode.
+polars get	dataframe
+	Creates dataframe with the selected columns.
+polars get-day	dataframe
+	Gets day from date.
+polars get-hour	dataframe
+	Gets hour from date.
+polars get-minute	dataframe
+	Gets minute from date.
+polars get-month	dataframe
+	Gets month from date.
+polars get-nanosecond	dataframe
+	Gets nanosecond from date.
+polars get-ordinal	dataframe
+	Gets ordinal from date.
+polars get-second	dataframe
+	Gets second from date.
+polars get-week	dataframe
+	Gets week from date.
+polars get-weekday	dataframe
+	Gets weekday from date.
+polars get-year	dataframe
+	Gets year from date.
+polars group-by	lazyframe
+	Creates a group-by object that can be used for other aggregations.
+polars implode	dataframe
+	Aggregates values into a list.
+polars integer	dataframe
+	Converts a string column into a integer column
+polars into-df	dataframe
+	Converts a list, table or record into a dataframe.
+polars into-lazy	lazyframe
+	Converts a dataframe into a lazy dataframe.
+polars into-nu	dataframe
+	Converts a dataframe or an expression into nushell value for access and exploration.
+polars is-duplicated	dataframe
+	Creates mask indicating duplicated values.
+polars is-in	expression
+	Creates an is-in expression or checks to see if the elements are contained in the right series
+polars is-not-null	dataframe
+	Creates mask where value is not null.
+polars is-null	dataframe
+	Creates mask where value is null.
+polars is-unique	dataframe
+	Creates mask indicating unique values.
+polars join	lazyframe
+	Joins a lazy frame with other lazy frame.
+polars last	dataframe
+	Creates new dataframe with tail rows or creates a last expression.
+polars lit	expression
+	Creates a literal expression.
+polars lowercase	dataframe
+	Lowercase the strings in the column.
+polars max	dataframe
+	Creates a max expression or aggregates columns to their max value.
+polars mean	dataframe
+	Creates a mean expression for an aggregation or aggregates columns to their mean value.
+polars median	lazyframe
+	Median value from columns in a dataframe or creates expression for an aggregation
+polars min	dataframe
+	Creates a min expression or aggregates columns to their min value.
+polars n-unique	dataframe
+	Counts unique values.
+polars not	dataframe
+	Inverts boolean mask.
+polars open	dataframe
+	Opens CSV, JSON, NDJSON/JSON lines, arrow, avro, or parquet file to create dataframe. A lazy dataframe will be created by default, if supported.
+polars otherwise	expression
+	Completes a when expression.
+polars pivot	dataframe
+	Pivot a DataFrame from wide to long format.
+polars profile	dataframe
+	Profile a lazy dataframe. This will run the query and return a record containing the materialized DataFrame and a DataFrame that contains profiling information of each node that is executed.
+
+The units of the timings are microseconds.
+polars quantile	lazyframe
+	Aggregates the columns to the selected quantile.
+polars query	dataframe
+	Query dataframe using SQL. Note: The dataframe is always named 'df' in your query's from clause.
+polars rename	dataframe or lazyframe
+	Rename a dataframe column.
+polars replace	dataframe
+	Replace the leftmost (sub)string by a regex pattern.
+polars replace-all	dataframe
+	Replace all (sub)strings by a regex pattern.
+polars reverse	dataframe
+	Reverses the LazyFrame
+polars rolling	dataframe
+	Rolling calculation for a series.
+polars sample	dataframe
+	Create sample dataframe.
+polars save	lazyframe
+	Saves a dataframe to disk. For lazy dataframes a sink operation will be used if the file type supports it (parquet, ipc/arrow, csv, and ndjson).
+polars schema	dataframe
+	Show schema for a dataframe.
+polars select	lazyframe
+	Selects columns from lazyframe.
+polars set	dataframe
+	Sets value where given mask is true.
+polars set-with-idx	dataframe
+	Sets value in the given index.
+polars shape	dataframe
+	Shows column and row size for a dataframe.
+polars shift	dataframe or lazyframe
+	Shifts the values by a given period.
+polars slice	dataframe
+	Creates new dataframe from a slice of rows.
+polars sort-by	lazyframe
+	Sorts a lazy dataframe based on expression(s).
+polars std	dataframe
+	Creates a std expression for an aggregation of std value from columns in a dataframe.
+polars store-get	dataframe
+	Gets a Dataframe or other object from the plugin cache.
+polars store-ls	dataframe
+	Lists stored polars objects.
+polars store-rm	dataframe
+	Removes a stored Dataframe or other object from the plugin cache.
+polars str-join	dataframe
+	Concatenates strings within a column or dataframes
+polars str-lengths	dataframe
+	Get lengths of all strings.
+polars str-slice	dataframe
+	Slices the string from the start position until the selected length.
+polars strftime	dataframe
+	Formats date based on string rule.
+polars sum	dataframe
+	Creates a sum expression for an aggregation or aggregates columns to their sum value.
+polars summary	dataframe
+	For a dataframe, produces descriptive statistics (summary statistics) for its numeric columns.
+polars take	dataframe
+	Creates new dataframe using the given indices.
+polars unique	dataframe or lazyframe
+	Returns unique values from a dataframe.
+polars unpivot	dataframe
+	Unpivot a DataFrame from wide to long format.
+polars uppercase	dataframe
+	Uppercase the strings in the column.
+polars value-counts	dataframe
+	Returns a dataframe with the counts for unique values in series.
+polars var	dataframe
+	Create a var expression for an aggregation.
+polars when	expression
+	Creates and modifies a when expression.
+polars with-column	dataframe or lazyframe
+	Adds a series to the dataframe.
+port	network
+	Get a free port from system.
+prepend	filters
+	Prepend any number of rows to a table.
+print	strings
+	Print the given values to stdout.
+ps	system
+	View information about system processes.
+pwd	default
+	Return the current working directory
+query	filters
+	Show all the query commands
+query db	database
+	Query a database using SQL.
+query json	filters
+	execute json query on json file (open --raw <file> | query json 'query string')
+query web	network
+	execute selector query on html/web
+query webpage-info	network
+	uses the webpage crate to extract info from html: title, description, language, links, RSS feeds, Opengraph, Schema.org, and more
+query xml	filters
+	execute xpath query on xml
+random	random
+	Generate a random value.
+random binary	random
+	Generate random bytes.
+random bool	random
+	Generate a random boolean value.
+random chars	random
+	Generate random chars uniformly distributed over ASCII letters and numbers: a-z, A-Z and 0-9.
+random dice	random
+	Generate a random dice roll.
+random float	random
+	Generate a random float within a range [min..max].
+random int	random
+	Generate a random integer [min..max].
+random uuid	random
+	Generate a random uuid4 string.
+range	filters
+	Return only the selected rows.
+reduce	filters
+	Aggregate a list (starting from the left) to a single value using an accumulator closure.
+registry query	system
+	Query the Windows registry.
+reject	filters
+	Remove the given columns or rows from the table. Opposite of `select`.
+rename	filters
+	Creates a new table with columns renamed.
+return	core
+	Return early from a function.
+reverse	filters
+	Reverses the input list or table.
+rm	filesystem
+	Remove files and directories.
+roll	filters
+	Rolling commands for tables.
+roll down	filters
+	Roll table rows down.
+roll left	filters
+	Roll record or table columns left.
+roll right	filters
+	Roll table columns right.
+roll up	filters
+	Roll table rows up.
+rotate	filters
+	Rotates a table or record clockwise (default) or counter-clockwise (use --ccw flag).
+run-external	system
+	Runs external command.
+save	filesystem
+	Save a file.
+schema	database
+	Show the schema of a SQLite database.
+scope	core
+	Commands for getting info about what is in scope.
+scope aliases	core
+	Output info on the aliases in the current scope.
+scope commands	core
+	Output info on the commands in the current scope.
+scope engine-stats	core
+	Output stats on the engine in the current state.
+scope externs	core
+	Output info on the known externals in the current scope.
+scope modules	core
+	Output info on the modules in the current scope.
+scope variables	core
+	Output info on the variables in the current scope.
+select	filters
+	Select only these columns or rows from the input. Opposite of `reject`.
+seq	generators
+	Output sequences of numbers.
+seq char	generators
+	Print a sequence of ASCII characters.
+seq date	generators
+	Print sequences of dates.
+shuffle	filters
+	Shuffle rows randomly.
+skip	filters
+	Skip the first several rows of the input. Counterpart of `drop`. Opposite of `first`.
+skip until	filters
+	Skip elements of the input until a predicate is true.
+skip while	filters
+	Skip elements of the input while a predicate is true.
+sleep	platform
+	Delay for a specified amount of time.
+sort	filters
+	Sort in increasing order.
+sort-by	filters
+	Sort by the given cell path or closure.
+source	core
+	Runs a script file in the current context.
+source-env	core
+	Source the environment from a source file into the current environment.
+split	strings
+	Split contents across desired subcommand (like row, column) via the separator.
+split cell-path	conversions
+	Split a cell-path into its components.
+split chars	strings
+	Split a string into a list of characters.
+split column	strings
+	Split a string into multiple columns using a separator.
+split list	filters
+	Split a list into multiple lists using a separator.
+split row	strings
+	Split a string into multiple rows using a separator.
+split words	strings
+	Split a string's words into separate rows.
+split-by	filters
+	Split a record into groups.
+start	filesystem
+	Open a folder, file or website in the default application or viewer.
+stor	database
+	Various commands for working with the in-memory sqlite database.
+stor create	database
+	Create a table in the in-memory sqlite database.
+stor delete	database
+	Delete a table or specified rows in the in-memory sqlite database.
+stor export	database
+	Export the in-memory sqlite database to a sqlite database file.
+stor import	database
+	Import a sqlite database file into the in-memory sqlite database.
+stor insert	database
+	Insert information into a specified table in the in-memory sqlite database.
+stor open	database
+	Opens the in-memory sqlite database.
+stor reset	database
+	Reset the in-memory database by dropping all tables.
+stor update	database
+	Update information in a specified table in the in-memory sqlite database.
+str	strings
+	Various commands for working with string data.
+str camel-case	strings
+	Convert a string to camelCase.
+str capitalize	strings
+	Capitalize first letter of text.
+str contains	strings
+	Checks if string input contains a substring.
+str distance	strings
+	Compare two strings and return the edit distance/Levenshtein distance.
+str downcase	strings
+	Make text lowercase.
+str ends-with	strings
+	Check if an input ends with a string.
+str expand	strings
+	Generates all possible combinations defined in brace expansion syntax.
+str index-of	strings
+	Returns start index of first occurrence of string in input, or -1 if no match.
+str join	strings
+	Concatenate multiple strings into a single string, with an optional separator between each.
+str kebab-case	strings
+	Convert a string to kebab-case.
+str length	strings
+	Output the length of any strings in the pipeline.
+str pascal-case	strings
+	Convert a string to PascalCase.
+str replace	strings
+	Find and replace text.
+str reverse	strings
+	Reverse every string in the pipeline.
+str screaming-snake-case	strings
+	Convert a string to SCREAMING_SNAKE_CASE.
+str snake-case	strings
+	Convert a string to snake_case.
+str starts-with	strings
+	Check if an input starts with a string.
+str stats	strings
+	Gather word count statistics on the text.
+str substring	strings
+	Get part of a string. Note that the first character of a string is index 0.
+str title-case	strings
+	Convert a string to Title Case.
+str trim	strings
+	Trim whitespace or specific character.
+str upcase	strings
+	Make text uppercase.
+sys	system
+	View information about the system.
+sys cpu	system
+	View information about the system CPUs.
+sys disks	system
+	View information about the system disks.
+sys host	system
+	View information about the system host.
+sys mem	system
+	View information about the system memory.
+sys net	system
+	View information about the system network interfaces.
+sys temp	system
+	View the temperatures of system components.
+sys users	system
+	View information about the users on the system.
+table	viewers
+	Render the table.
+take	filters
+	Take only the first n elements of a list, or the first n bytes of a binary value.
+take until	filters
+	Take elements of the input until a predicate is true.
+take while	filters
+	Take elements of the input while a predicate is true.
+tee	filters
+	Copy a stream to another command in parallel.
+term size	platform
+	Returns a record containing the number of columns (width) and rows (height) of the terminal.
+timeit	debug
+	Time the running time of a block.
+to	formats
+	Translate structured data to a format.
+to csv	formats
+	Convert table into .csv text .
+to html	formats
+	Convert table into simple HTML.
+to json	formats
+	Converts table data into JSON text.
+to md	formats
+	Convert table into simple Markdown.
+to msgpack	formats
+	Convert Nu values into MessagePack.
+to msgpackz	formats
+	Convert Nu values into brotli-compressed MessagePack.
+to nuon	formats
+	Converts table data into Nuon (Nushell Object Notation) text.
+to plist	formats
+	Convert Nu values into plist
+to text	formats
+	Converts data into simple text.
+to toml	formats
+	Convert record into .toml text.
+to tsv	formats
+	Convert table into .tsv text.
+to xml	formats
+	Convert special record structure into .xml text.
+to yaml	formats
+	Convert table into .yaml/.yml text.
+touch	filesystem
+	Creates one or more files.
+transpose	filters
+	Transposes the table contents so rows become columns and columns become rows.
+try	core
+	Try to run a block, if it fails optionally run a catch closure.
+tutor	misc
+	Run the tutorial. To begin, run: tutor.
+ulimit	platform
+	Set or get resource usage limits.
+uname	system
+	Print certain system information using uutils/coreutils uname.
+uniq	filters
+	Return the distinct values in the input.
+uniq-by	filters
+	Return the distinct values in the input by the given column(s).
+update	filters
+	Update an existing column to have a new value.
+update cells	filters
+	Update the table cells.
+upsert	filters
+	Update an existing column to have a new value, or insert a new column.
+url	network
+	Various commands for working with URLs.
+url build-query	network
+	Converts record or table into query string applying percent-encoding.
+url decode	strings
+	Converts a percent-encoded web safe string to a string.
+url encode	strings
+	Converts a string to a percent encoded web safe string.
+url join	network
+	Converts a record to url.
+url parse	network
+	Parses a url.
+use	core
+	Use definitions from a module, making them available in your shell.
+values	filters
+	Given a record or table, produce a list of its columns' values.
+version	core
+	Display Nu version, and its build configuration.
+view	debug
+	Various commands for viewing debug information.
+view files	debug
+	View the files registered in nushell's EngineState memory.
+view ir	debug
+	View the compiled IR code for a block of code.
+view source	debug
+	View a block, module, or a definition.
+view span	debug
+	View the contents of a span.
+watch	filesystem
+	Watch for file changes and execute Nu code when they happen.
+where	filters
+	Filter values based on a row condition.
+which	system
+	Finds a program file, alias or custom command.
+while	core
+	Conditionally run a block in a loop.
+whoami	platform
+	Get the current username using uutils/coreutils whoami.
+window	filters
+	Creates a sliding window of `window_size` that slide by n rows/elements across input.
+with-env	env
+	Runs a block with an environment variable set.
+wrap	filters
+	Wrap the value into a column.
+zip	filters
+	Combine a stream with the input.
+*** planned
+* System Concepts
+
+** Pathnames
+
+Common Lisp is older than any of the file systems in use today, its pathname
+system is still more powerful and still relevant to every possible system. That
+is a clue that there are some significant differences in how this is being
+acomplished, some will not be intuitive.
+https://lispcookbook.github.io/cl-cookbook/files.html
+is essential reading, twice.
+
+These tools cover far MORE than linux can acomplish with a filesystem Clarifying
+and reducing friction for file and dir ops is one of the major objectives of
+this project
+- https://asdf.common-lisp.dev/uiop.html
+- https://osicat.common-lisp.dev/manual/osicat.html
+- https://github.com/Shinmera/pathname-utils
+- https://github.com/fosskers/filepaths
+- https://codeberg.org/fourier/ppath
+
+#+begin_src lisp
+                                          ; pathname objects are not strings
+  #P"/bin/"
+  ;; subcomponents can be manipulated individually
+  ;; inspect &&&
+
+                                          ; concepts dont exist in CL, use a function to get the value
+  ;; ~ for home
+  (user-homedir-pathname)
+
+  ;; . for this location
+  (print *default-pathname-defaults*)
+
+  ;; pwd
+  (uiop:getcwd)
+  ;; except  some operations will still begin from *default-pathname-defaults*
+#+end_src
+
+Override default-pathname-defaults
+#+begin_src lisp
+  (uiop:with-current-directory ("/bin")
+    (print (uiop:getcwd))
+    (directory-files "./"))
+
+  (print (uiop:getcwd))
+
+  (with-current-directory ("/tmp")
+    (print (uiop:getcwd)))
+#+end_src
+
+** directory
+
+#+begin_src lisp
+(cd "/")
+(directory "*") ;=> dirs here
+
+(directory "*/**") ;=> lots! no files
+(directory "*/**/") ;very slow or no return
+
+(directory "bulk-1/*") ;=> dirs in bulk-1
+(directory "/bulk-1/*") ;=> dirs in bulk-1
+(directory "bulk-1/*/") ;=> dirs in bulk-1
+(directory "/bulk-1/*/") ;=> dirs in bulk-1
+(directory "bulk-1/**") ;=> dirs in bulk-1
+(directory "/bulk-1/**") ;=> dirs in bulk-1
+                                        ; conclusion
+                                        ; preceeding / does not matter
+
+(directory "bulk-1/**/") ;=> all dirs below bulk-1
+(directory "bulk-1/**/*") ;=> all dirs below bulk-1 and some dotfiles
+(directory "bulk-1/**/*.*") ;=> lots of files below bulk-1 no tif, may be past context
+(directory "bulk-1/**/*.tif") ;=> all tif below bulk-1
+                                        ; conclusion
+                                        ; * is / delimited wildcard but not files
+                                        ; ** is path wildcard
+                                        ; . is special at end
+
+(directory "bulk-1/**/*UNMERGED") ;=> one match
+(directory "bulk-1/**/*UNMERGED/") ;=> NIL
+(directory "bulk-1/**/*COPY") ; one match
+(directory "bulk-1/**/*COPY/") ;=> NIL
+
+
+(directory "bulk-1/**/*UNMERGED/**") ;=> NIL
+(directory "bulk-1/**/*UNMERGED/**/") ;=> NIL
+(directory "bulk-1/**/*UNMERGED/*.*") ;=> NIL
+(directory "bulk-1/**/*UNMERGED/**/*.*") ;=> NIL
+
+(directory "**/*.tif") ;all tif
+(directory "**/tiles/**/*.tif")
+(directory "**/indicies/**/*.tif")
+#+end_src
+
+** finder
+https://github.com/lisp-maintainers/file-finder/
+
+(finder (function "string")) => #F"file_object.type"
+
+Finder functions <ff>
+path~: matches when one of the path elements is contained in the file path.
+every-path~: same checks on the file path, but uses a logical and.
+path$: matches when one of the path suffixes matches the file path.
+name=: matches when one of the names matches the file name (case sensitive).
+iname=: matches when one of the names matches the file name (case insensitive).
+name~: matches when one of the names is contained in the file basename (and not the whole path), case sensitive.
+every-name~: same checks on the file basename, but uses a logical and.
+iname~: matches when one of the names is contained in the file, case insensitive.
+depth<: matches when the argument file is in a subdirectory of ROOT less deep than LEVEL.
+extension=: matches file extensions
+
+#+begin_src lisp
+                                          ;set interpretation of finder calls <fc>
+  ;; and
+  (finder (<ff>)(<ff>))
+  ;; or
+  (finder (list (<ff>)(<ff>)))
+
+                                          ; use set math over stringified finder call
+  (set-difference <fc>)
+  (union <fc>)
+
+                                          ; example that "works on my machine" you will need to test each component
+  (defun layers-from-paths ()
+    "finds files in a dir"
+
+    ;; go to disk region of copied data
+    (cd "/")
+                                          ; match the path
+                                          ; &&&test is 1 item before firsting
+                                          ; get car
+                                          ; make #P<> a string
+                                          ; go there and report
+    (cd (path (first (directory "bulk-1/**/*COPY"))))
+    (format t "Collecting layers from: ~A~%" (pwd))
+                                          ; return string representation of files
+    (set-difference
+     (mapcar #'path (finder (path~ "index") (path~ "indices") (extension= "tif")))
+     (mapcar #'path (finder (path~ "tiles")))
+     :test #'equal))
+#+end_src
+
+** Dir Operations
+ls -d = (directory "*")
+
+cd = (uiop:chdir #P)
+(uiop:getcwd)
+(setf *default-pathname-defaults*(uiop:getcwd))
+
+** File Operations
+ls -f = (directory-files &&&
+
+** File IO
+
+#+begin_src lisp
+  (defparameter *file* #p"/home/user/test.txt")
+  (print *file*)
+  (uiop:read-file-lines *file*)
+
+                                          ; open files
+  (with-open-file (stream "test.txt" :direction :output
+                                     :if-exists :supersede)
+    (write-line "Hello, World!" stream))
+
+  (with-open-file (stream "test.txt"
+                          :direction :input
+                          :if-does-not-exist :error)
+    (let ((contents (make-string (file-length stream))))
+      (read-sequence contents stream)
+      (print contents)))
+
+  (with-open-file (stream filename)
+    (iter (for line = (read-line stream nil))
+          (while line)
+          (format t "~A%~%" line)))
+#+end_src
+
+** System info
+https://github.com/Shinmera/machine-state/
+** REPL and error and messages
+editor function
+https://lispcookbook.github.io/cl-cookbook/emacs-ide.html
+
+How to interact with the repl
+move around in error message
+Observe objects
+Eval small statements
+
+* Syntax Concepts
+https://lisp-lang.org/learn/getting-started/
+
+mini spec
+https://lamberta.github.io/minispec/
+
+
+** Parens are just a tree
+Don't look at the parens, look at the indentation and see the tree
+The abstract syntax tree is immediately available to the programmer and to the program
+
+Math example
+#+begin_src lisp
+
+  (+ (* 3 4) (- 10 5) (/ 12 (+ 2 2)))
+
+  ;; math is just a tree of operations
+  (+ (* 3
+        4)
+     (- 10
+        5)
+     (/ 12
+        (+ 2
+           2)))
+#+end_src
+
+Nested lists example
+#+begin_src lisp
+  (defvar *tree* '(A(B(D)(E))(C(F)(G)(H))))
+
+  ;; data is just a tree of relationships
+  (A
+   (B
+    (D)
+    (E))
+   (C
+    (F)
+    (G)
+    (H)))
+#+end_src
+
+Tree traversal example
+#+begin_src lisp
+  ;; code is just trees of steps
+  (defun traverse (tree)
+    (when tree                        ;stops when nothing
+      (if (atom tree)                 ;test for a leaf node
+          (print tree)                ; true, print the leaf
+          (progn                      ; else, do these things
+            (print (car tree))        ;  print parent before decending
+            (traverse (cdr tree)))))) ;  descend into the remainder of the tree
+#+end_src
+
+Q: If code is just trees, and data and calculations are just trees
+and we have code that walks into a tree
+does that mean a program could go into a program?
+could a program treat a program like data and change it?
+
+A: It is just a tree, code is data, data is code.
+
+** par vs var
+Clarify which is immutable
+** functions
+** args
+** quoting data
+** logic
+** control
+* Interop
+** Cmd
+Calls to command line, protected and various return types
+https://github.com/ruricolist/cmd
+
+#+begin_src lisp
+                                          ; Loading
+  (ql:quickload :cmd)
+  (use-package :cmd)
+
+                                          ; Usage
+  ($cmd "ls")
+  ($sh "cd ~; ls")
+  ($sh "pwd")
+  ($cmd "echo a b \
+                    c \
+                    d")
+
+  ($cmd "echo 'hello world' >> text.txt")
+  ($cmd "echo 'hello world' > text.txt")
+
+  (defun call-cmd (arg arg1)
+    ($cmd (format nil "echo hello:
+                                   ~A
+                                   ~A" arg arg1)))
+  (call-cmd "Lamb" "Duh")
+
+                                          ; &&& return types
+  (cmd "cmd")
+  ($cmd "cmd")
+  ($sh "cmd")
+
+#+end_src
+
+** py4cl
+Calls to and imports from Python
+https://github.com/digikar99/py4cl2
+#+begin_src lisp
+                                          ; Load
+  (ql:quickload :py4cl)
+
+                                          ; test setup finds python on path
+  (py4cl:python-version-info) ; fails if python command is not resolved in system
+  (print py4cl:*python-command*)
+  (setf py4cl:*python-command* "python3")
+  (py4cl:python-version-info)
+  (py4cl:import-module "math")
+  (py4cl:python-eval "math.pi")
+
+                                          ; &&&usage
+  (py4cl:import-module "numpy" :as "np")
+  (py4cl:python-eval "[i**2 for i in range(5)]") ; => #(0 1 4 9 16)
+#+end_src
+
+** Clesh
+https://github.com/Neronus/clesh
+clesh is included here mostly to show off how
+flexible lisp can be, this is almost unthinkable in other languages, yet it is
+transparently available without core language changes.
+
+I recommend using cmd over clesh for permanent work, but for experimental, fast
+tasks, scripts etc this mixed inlining is very handy indeed. cmd is more
+controlable and disciplined and better suited for wrapping calls for serious
+use.
+
+#+begin_src lisp
+                                          ; load
+  (ql:quickload :clesh)
+  (use-package :named-readtables)
+  (in-readtable clesh:syntax)
+
+                                          ; usage
+  ;; repl out
+  !ls
+  !echo ?(+ 2 3) foo 5 bar
+
+  ;;messages out
+  [echo one two three] ;call bash command
+  [echo one ?(+ 1 1) three] ;call lisp command in bash command
+  (princ [echo foo]) ;call bash command in lisp command
+
+  (defparameter *val* 42)
+  [echo one ?*val* three] ;sub lisp var in bash arg
+  [echo one ?(princ *val*) three] ;sub lisp command in bash arg
+
+  ;; break bash commands
+  [echo one \
+  two \
+  three]
+
+  (princ [echo one \
+         ?*val* \
+         three]) ;sub lisp var in bash arg
+
+  (princ [echo one \
+         ?(+ *val* *val*) \
+         three]) ;sub lisp command in bash arg
+
+  ;; within a function
+  (defun call-clesh (arg arg1)
+    [echo \
+    Hello: \
+    ?arg \
+    "FOO" ?arg1])
+  (call-clesh "Lamb" "Duh")
+#+end_src
+
+** Scripting
+*** command line args
+unix-opts
+https://github.com/libre-man/unix-opts
+*** export binaries
+* Packages
+** strings
+str
+https://github.com/vindarel/cl-str
+regex
+https://edicl.github.io/cl-ppcre/
+time
+https://local-time.common-lisp.dev/
+** stats and dataframes
+
+lispstat
+https://lisp-stat.dev/
+#+begin_src lisp
+                                          ; Cffi path Ref: https://lists.gnu.org/archive/html/bug-guix/2020-01/msg00133.html
+  ;; (ql:quickload :lisp-stat)
+
+                                          ; usage&&&
+#+end_src
+
+** Testing
+https://github.com/lmj/1am
+https://github.com/AccelerationNet/lisp-unit2
+** Logging
+https://shinmera.github.io/verbose/
+** lparallel
+
+#+begin_src lisp
+                                          ; lparallel startup
+  (ql:quickload :lparallel)
+  (use-package :lparallel)
+  (setf lparallel:*kernel* (lparallel:make-kernel 8)) ;set worker threads
+
+                                          ; env setup for examples
+  (defun gt-five (x)
+    (if (> x 5)
+        x))
+
+  (defun lt-five (x)
+    (if (< x 5)
+        x))
+
+  (defparameter *mylist* '(0 1 2 3 4 5 6 7 8 9 10) )
+
+                                          ; usage
+  (pmap 'list (lambda (x) (* x x)) '(1 2 3 4))
+  (preduce #'+ #(1 2 3 4 5))
+
+  (premove '5 '(1 2 3 4 5 6 7 8 9 0))
+
+  (premove-if (lambda (x) (> x 5)) '(0 1 2 3 4 5 6 7 8 9 10))
+  (premove-if #'gt-five '(0 1 2 3 4 5 6 7 8 9 10))
+  (premove-if #'gt-five *mylist*)
+
+  (premove-if-not #'gt-five *mylist*)
+  (premove-if #'gt-five *mylist*)
+  (premove-if #'lt-five *mylist*)
+  (premove-if-not #'lt-five *mylist*)
+
+  (defun my-filter (predicate list)
+    (reduce 'nreconc
+            (lparallel:preduce-partial (lambda (acc x)
+                                         (if (funcall predicate x)
+                                             acc
+                                             (cons x acc)))
+                                       list
+                                       :initial-value nil)
+            :initial-value nil
+            :from-end t))
+
+  (my-filter #'gt-five *mylist*)
+  #+end_src
+
+** iteration
+*** built in
+#+begin_src lisp
+  ;;dotimes
+  (dotimes (n 3)
+    (print n))
+
+  ;;dolist
+  (dolist (i '(1 2 3))
+    (print i))
+
+  ;;mapcar
+  (mapcar #'print '(1 2 3))
+
+  ;; There is also the built in loop macro, its syntax is powerful, but non idiomatic
+#+end_src
+
+*** iterate
+#+begin_src lisp
+  (ql:quickload "iterate")
+  (use-package :iterate)
+
+                                          ; Simple iteration over a range:
+  (iter (for i from 1 to 10)
+        (sum i))
+
+                                          ; Simple iteration over a list:
+  (iter (for x in '(1 2 3 4 5))
+        (sum x))
+
+                                          ; Iterating over a range of numbers:
+  (iter (for i from 1 to 5)
+        (collect (* i i)))
+
+  (iter (for i from 1 to 5)
+        (sum (* i i)))
+
+                                          ; Iterating over a hash table:
+  (let ((ht (make-hash-table)))
+    (setf (gethash 'a ht) 1
+          (gethash 'b ht) 2
+          (gethash 'c ht) 3)
+    (iterate (for (k v) in-hashtable ht)
+             (collect (list k v))))
+                                          ; => ((C 3) (B 2) (A 1))
+
+                                          ; Nested iteration:
+  (iter (for i from 1 to 3)
+           (collect (iterate (for j from 1 to i)
+                             (collect j))))
+                                          ; => ((1) (1 2) (1 2 3))
+#+end_src
+
+*** series
+
+#+begin_src lisp
+                                          ; Basic mapping:
+  (series:collect
+   (series:map-fn 'number #'1+ (series:scan '(1 2 3 4 5))))
+  ;; Result: (2 3 4 5 6)
+
+                                          ; Filtering even numbers:
+  (series:collect
+   (series:choose-if #'evenp (series:scan '(1 2 3 4 5 6))))
+  ;; Result: (2 4 6)
+
+                                          ; Generating an infinite series and taking first 5 elements:
+  (series:collect
+   (series:subseries (series:scan-range :from 1) 0 5))
+  ;; Result: (1 2 3 4 5)
+
+                                          ; Combining multiple series:
+  (series:collect
+   (series:map-fn 'string #'(lambda (x y) (format nil "~A-~A" x y))
+                  (series:scan '("a" "b" "c"))
+                  (series:scan '(1 2 3))))
+  ;; Result: ("a-1" "b-2" "c-3")
+#+end_src
+
+** types
+coalton
+https://github.com/coalton-lang/coalton/
+** database
+mito
+https://github.com/fukamachi/mito
+clsql
+http://clsql.kpe.io/
+#+begin_src lisp
+                                          ; Connecting to a database:
+  (clsql:connect '("localhost" "mydb" "user" "password") :database-type :mysql)
+
+                                          ; Creating a table:
+  (clsql:execute-command "CREATE TABLE users (id INT PRIMARY KEY, name VARCHAR(50), age INT)")
+
+                                          ; Inserting data:
+  (clsql:insert-records :into [users] :attributes '(id name age) :values '(1 "John Doe" 30))
+
+                                          ; Querying data:
+  (clsql:select 'name :from [users] :where [= [age] 30])
+
+                                          ; Updating records:
+  (clsql:update-records [users] :attributes '(age) :values '(31) :where [= [name] "John Doe"])
+
+#+end_src
+
+** math
+in hyperspec as numbers
+https://novaspec.org/cl/12_1_Number_Concepts
+
+ML
+https://github.com/melisgl/mgl
+
+cl-ana
+
+numcl, numpy clone
+https://numcl.github.io/numcl/
+#+begin_src lisp
+                                          ; Creating and manipulating arrays:
+  (numcl:array '(1 2 3 4 5))  ; Create a 1D array
+  (numcl:zeros '(3 3))        ; Create a 3x3 array of zeros
+  (numcl:aref my-array 1 2)   ; Access element at row 1, column 2
+
+                                          ; Basic operations:
+  (numcl:+ (numcl:array '(1 2 3)) (numcl:array '(4 5 6)))  ; Element-wise addition
+  (numcl:* (numcl:array '(1 2 3)) 2)                       ; Scalar multiplication
+
+                                          ; Mathematical functions:
+  (numcl:sin (numcl:array '(0 (/ pi 2) pi)))  ; Element-wise sine
+  (numcl:exp (numcl:array '(0 1 2)))          ; Element-wise exponential
+
+                                          ; Linear algebra:
+  (numcl:matmul matrix1 matrix2)  ; Matrix multiplication
+  (numcl:transpose my-matrix)     ; Matrix transposition
+#+end_src
+
+** Pipelines
+cl ana
+https://github.com/ghollisjr/cl-ana/wiki
+memoization
+https://github.com/AccelerationNet/function-cache
+** data structures
+*** a and p lists
+
+*** hashtables
+
+#+begin_src lisp
+                                          ; Creating and using a simple hashtable:
+  (defvar *fruit-prices* (make-hash-table :test #'equal))
+
+  (setf (gethash "apple" *fruit-prices*) 0.50)
+  (setf (gethash "banana" *fruit-prices*) 0.75)
+
+  (format t "An apple costs $~A~%" (gethash "apple" *fruit-prices*))
+
+                                          ; Using gethash with a default value:
+  (defvar *user-scores* (make-hash-table))
+
+  (setf (gethash "Alice" *user-scores*) 100)
+
+  (format t "Bob's score: ~A~%" (gethash "Bob" *user-scores* 0))
+
+                                          ; Iterating over a hashtable:
+  (defvar *capitals* (make-hash-table :test #'equal))
+  (setf (gethash "France" *capitals*) "Paris"
+        (gethash "Japan" *capitals*) "Tokyo")
+
+  (maphash #'(lambda (country capital)
+               (format t "The capital of ~A is ~A~%" country capital))
+           ,*capitals*)
+
+                                          ; Removing an entry and checking the count:
+  (defvar *inventory* (make-hash-table))
+  (setf (gethash 'book *inventory*) 5
+        (gethash 'pen *inventory*) 10)
+
+  (remhash 'book *inventory*)
+  (format t "Items in inventory: ~A~%" (hash-table-count *inventory*))
+#+end_src
+
+fset gmap
+https://github.com/slburson/fset
+https://github.com/slburson/misc-extensions
+listopia
+https://github.com/Dimercel/listopia
+;series
+https://github.com/rtoy/cl-series
+** Data formats IO
+https://github.com/Zulu-Inuoe/jzon/
+https://github.com/AccelerationNet/cl-csv
+https://github.com/defunkydrummer/lisp-xl
+** distribution
+quicklisp
+https://www.quicklisp.org/beta/
+ultralisp
+https://ultralisp.org/
+asdf
+https://asdf.common-lisp.dev/
+* Help
+#+begin_src lisp
+
+  ;;inspect
+  ;;(inspect "string")
+  ;;describe
+  ;;(describe "string")
+  ;;apropos
+  ;;(apropos "string")
+  ;;documentation
+  ;;(documentation "string")
+
+  ;;(help) and (help "symbol")
+  ;; should be an interactive menu describing the options/ letting user go on to any or all sub
+  ;; (help "help") should go give detailed descriptions of each  option
+#+end_src
+quicksearch
+https://github.com/lisp-maintainers/quicksearch
+
+package help
+symbol help
+namespace help
+** Acknowledgements
+Smarter programmers than I have gone these ways, I have made this because I am a simple and silly sheep.
+
+** Resources
+mini spec
+https://lamberta.github.io/minispec/
+
+https://lispcookbook.github.io/cl-cookbook/
+common lisp by example
+http://csci.viu.ca/~wesselsd/courses/csci330/code/sbcl-lisp/index.html
+hyperspec
+https://www.lispworks.com/documentation/HyperSpec/Front/
+https://novaspec.org/cl/
+awesome common lisp
+https://github.com/CodyReichert/awesome-cl
+common lisp wiki, almost every CL package
+https://www.cliki.net/
+
+&&& to zotero
+https://www.math.fau.de/wp-content/uploads/2020/09/Preprint-2002-40-scan.pdf
+* Burrito recipie
+Lamb-duh's secret meaty goodness
+- where other cookbooks have gone before me, I follow with a burrito!
+  - A self contained unit that conveniently wraps its contents into a delicious uniform delivery system
+  - A very spicy monoid in the category of endofunctors
