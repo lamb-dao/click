@@ -132,6 +132,7 @@ The convenience commands should move the user toward the language.
 * System Concepts
 ** Pathnames
 
+
 Common Lisp is older than any of the file systems in use today, its pathname
 system is still more powerful and still relevant to every possible system. That
 is a clue that there are some significant differences in how this is being
@@ -154,20 +155,23 @@ this project.
   ;; subcomponents can be manipulated individually
   ;; inspect &&&
 
-                                          ; concepts dont exist in CL, use a function to get the value
   ;; ~ for home
   (user-homedir-pathname)
 
   ;; . for this location
-  (print *default-pathname-defaults*)
-
-  ;; pwd
   (uiop:getcwd)
-  ;; except  some operations will still begin from *default-pathname-defaults*
+
+
 #+end_src
 
 Override default-pathname-defaults
 #+begin_src lisp
+  ;; this guy causes issues if Im not paying attention
+  (print *default-pathname-defaults*)
+
+  ;; &&&note elsewhere how (print (foo)) is transparent, prints and passes (foo) through
+  ;; very nice for debugging
+
   (uiop:with-current-directory ("/bin")
     (print (uiop:getcwd))
     (directory-files "./"))
