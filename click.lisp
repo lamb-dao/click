@@ -23,17 +23,53 @@
    :grep
    :which
    :echo
-   :*start-directory*
+   :*default-pathname-initialized*
+   :*default-pathname-starts*
    ))
 
-; &&& shadowing command conflicts example
+                                        ; &&& shadowing command conflicts example
 
                                         ; enter package
 (in-package :click) ; Also enter this in the REPL!
 
-;;;; ==================================== location
-                                        ; &&& test from external usage
-(defparameter *start-directory* (uiop:getcwd))
+;;;; ==================================== initializations
+
+(defun on-start ()
+  "&&& everything that should happen every startup"
+  (quicklisp:update-all-dists)
+  &&& setup and export and doc
+  ;; locations complementary to  *default-pathname-defaults*
+  (defvar *default-pathname-start* (uiop:getcwd)
+    "Set to the location from which invoked, unchangable")
+  (defparameter *default-pathname-target* (uiop:getcwd)
+    "Set to the location from which invoked, changable to set the project root")
+  &&& start cl-schedule
+  )
+(on-start)
+
+(defun on-target ()
+  "&&& everything that should happen once the user has navigated to target location"
+
+  (defparameter *default-pathname-target* (uiop:getcwd)
+    "Set to the location from which invoked, changable to set the project root")
+  )
+
+(defun begin-events ()
+  "&&& checks for ~/click if E then check for events.lisp")
+
+(defun setup-unix-in-lisp ()
+  "&&& unix-in-lisp check and install on init, no user interaction"
+  ;; &&& if not there clone it
+  ;; git clone https://github.com/PuellaeMagicae/unix-in-lisp ~/quicklisp/local-projects/unix-in-lisp/
+  ;; &&& if there update it
+
+  ;; known: dists are updated by on-start
+  ;; call for deps
+  (ql:quickload "unix-in-lisp")
+  ;; finally invoke
+  (require 'unix-in-slime "~/quicklisp/local-projects/unix-in-lisp/unix-in-slime")
+  )
+(setup-unix-in-lisp)
 
 ;;;; ==================================== bash wrappers
 (defun pwd ()
@@ -136,15 +172,6 @@ TODO Not recursive Only Files"
           (format t "File '~A' moved to '~A' successfully.~%" source destination))
         (format t "Source file '~A' not found.~%" source))))
 
-(defun touch (filename)
-  "Create a new empty file or update the timestamp of an existing file"
-  (let ((target-file (merge-pathnames (pathname filename) (pwd))))
-    (if (probe-file target-file)
-        (uiop:touch-file target-file)
-        (with-open-file (stream target-file :direction :output :if-does-not-exist :create)
-          (declare (ignore stream))))
-    (format t "Touched file: ~A~%" filename)))
-
 (defun chmod (mode filename)
   "Change file mode bits"
   (let ((result ($cmd (format nil "chmod ~A ~A" mode filename))))
@@ -159,12 +186,13 @@ TODO Not recursive Only Files"
         (format t "Changed ownership of '~A' to ~A~%" filename owner)
         (format t "~A" result))))
 
-(defun find (path &optional (expression ""))
-  "Find files in a directory hierarchy"
-  (let ((result ($cmd (format nil "find ~A ~A" path expression))))
-    (if (string= result "")
-        (format t "No files found.~%")
-        (format t "~A" result))))
+
+
+
+
+
+
+
 
 (defun whoami ()
   "Print the current user name"
@@ -193,14 +221,16 @@ TODO Not recursive Only Files"
           (format t "Unable to retrieve date and time.~%")
           (format t "~A" result)))))
 
-(defun time (command)
-  "Execute a command and print time taken"
-  (let* ((start-time (get-internal-real-time))
-         (result ($cmd command))
-         (end-time (get-internal-real-time))
-         (elapsed-time (/ (- end-time start-time) internal-time-units-per-second)))
-    (format t "~A" result)
-    (format t "~%Time elapsed: ~,3F seconds~%" elapsed-time)))
+
+
+
+
+
+
+
+
+
+
 
 (defun head (filename &optional (n 10))
   "Display the first N lines of a file (default 10)"
@@ -218,17 +248,6 @@ TODO Not recursive Only Files"
       (loop for line in (last lines n)
             do (format t "~A~%" line)))))
 
-(defun sort (filename &optional reverse)
-  "Sort lines of text file"
-  (let* ((lines (with-open-file (stream filename)
-                  (loop for line = (read-line stream nil)
-                        while line
-                        collect line)))
-         (sorted-lines (sort lines #'string<)))
-    (if reverse
-        (setf sorted-lines (nreverse sorted-lines)))
-    (dolist (line sorted-lines)
-      (format t "~A~%" line))))
 
 (defun uniq (filename &optional count)
   "Filter adjacent matching lines from input"
@@ -275,8 +294,44 @@ TODO Not recursive Only Files"
  in-word (incf words)))))
     (format t "~5d ~5d ~5d~@[ ~A~]~%" lines words chars filename)))
 
+
 ;;;; =================================== to implement
 
+(defun sort (filename &optional reverse)
+  "Sort lines of text file"
+  (let* ((lines (with-open-file (stream filename)
+                  (loop for line = (read-line stream nil)
+                        while line
+                        collect line)))
+         (sorted-lines (sort lines #'string<)))
+    (if reverse
+        (setf sorted-lines (nreverse sorted-lines)))
+    (dolist (line sorted-lines)
+      (format t "~A~%" line))))
+(defun time (command)
+  "Execute a command and print time taken"
+  (let* ((start-time (get-internal-real-time))
+         (result ($cmd command))
+         (end-time (get-internal-real-time))
+         (elapsed-time (/ (- end-time start-time) internal-time-units-per-second)))
+    (format t "~A" result)
+    (format t "~%Time elapsed: ~,3F seconds~%" elapsed-time)))
+
+(defun find (path &optional (expression ""))
+  "Find files in a directory hierarchy"
+  (let ((result ($cmd (format nil "find ~A ~A" path expression))))
+    (if (string= result "")
+        (format t "No files found.~%")
+        (format t "~A" result))))
+
+(defun touch (filename)
+  "Create a new empty file or update the timestamp of an existing file"
+  (let ((target-file (merge-pathnames (pathname filename) (pwd))))
+    (if (probe-file target-file)
+        ;&&& (uiop:touch-file target-file)
+        (with-open-file (stream target-file :direction :output :if-does-not-exist :create)
+          (declare (ignore stream))))
+    (format t "Touched file: ~A~%" filename)))
 (defun p (str &key (:p nil ) (:t "A" ))
   "TODO fast and simple printing utility
 takes a string like: The (quick) brown (fox)
@@ -315,3 +370,103 @@ if multiple dirs are found reports the dirs at point
 type lets you drill down to a specific help type
 easter-egg (help burrito) prints the recipie
 eg system-apropos, describe, burrito etc")
+
+
+
+
+I removed all hu.dwim* packages, updated all dists,  then began install of the package of interest.
+We see it fetches the hu.dwim* and errors on the last.
+
+
+To load "unix-in-lisp":
+  Load 1 ASDF system:
+    unix-in-lisp
+; Loading "unix-in-lisp"
+...........To load "hu.dwim.walker":
+  Load 8 ASDF systems:
+    alexandria anaphora asdf closer-mop contextl
+    hu.dwim.asdf iterate metabang-bind
+  Install 7 Quicklisp releases:
+    hu.dwim.common hu.dwim.common-lisp hu.dwim.def
+    hu.dwim.defclass-star hu.dwim.syntax-sugar hu.dwim.util
+    hu.dwim.walker
+; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.syntax-sugar/2023-02-14/hu.dwim.syntax-sugar-stable-git.tgz">
+; 18.56KB
+==================================================
+19,007 bytes in 0.01 seconds (1546.79KB/sec)
+; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.common-lisp/2021-02-28/hu.dwim.common-lisp-stable-git.tgz">
+; 2.05KB
+==================================================
+2,104 bytes in 0.00 seconds (2054.69KB/sec)
+; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.common/2015-07-09/hu.dwim.common-20150709-darcs.tgz">
+; 3.01KB
+==================================================
+3,083 bytes in 0.00 seconds (3010.74KB/sec)
+; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.util/2021-12-30/hu.dwim.util-stable-git.tgz">
+; 49.65KB
+==================================================
+50,837 bytes in 0.04 seconds (1272.93KB/sec)
+; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.defclass-star/2021-12-30/hu.dwim.defclass-star-stable-git.tgz">
+; 8.90KB
+==================================================
+9,114 bytes in 0.00 seconds (0.00KB/sec)
+; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.def/2021-12-30/hu.dwim.def-stable-git.tgz">
+; 19.65KB
+==================================================
+20,120 bytes in 0.01 seconds (2183.16KB/sec)
+; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.walker/2022-07-07/hu.dwim.walker-stable-git.tgz">
+; 37.45KB
+==================================================
+38,345 bytes in 0.04 seconds (1069.89KB/sec)
+; Loading "hu.dwim.walker"
+..................................................
+[package hu.dwim.def].............................
+[package hu.dwim.defclass-star]...................
+[package hu.dwim.common-lisp].....................
+[package hu.dwim.common]..........................
+[package hu.dwim.syntax-sugar]....................
+[package hu.dwim.util]............................
+[package hu.dwim.util/error-reports].
+
+; file: /home/user/quicklisp/dists/quicklisp/software/hu.dwim.util-stable-git/source/miscellaneous.lisp
+; in: DEF #'IOE
+;     (METABANG.BIND:BIND #*
+;       ((:SBCL ((*EVALUATOR-MODE* :INTERPRET))))
+;       (EVAL HU.DWIM.UTIL::FORM))
+;
+; caught ERROR:
+;   during macroexpansion of
+;   (BIND #*
+;     (#)
+;     ...).
+;   Use *BREAK-ON-SIGNALS* to intercept.
+;
+;    The value
+;      #*
+;    is not of type
+;      LIST
+
+;
+; caught ERROR:
+;   READ error during COMPILE-FILE:
+;
+;     no dispatch function defined for #\t
+;
+;       Line: 33, Column: 34, File-Position: 1047
+;
+;       Stream: #<SB-INT:FORM-TRACKING-STREAM for "file /home/user/quicklisp/dists/quicklisp/software/hu.dwim.util-stable-git/source/miscellaneous.lisp" {100BB290A3}>
+;
+; compilation unit aborted
+;   caught 2 fatal ERROR conditions
+;   caught 2 ERROR conditions
+; Evaluation aborted on #<UIOP/LISP-BUILD:COMPILE-FILE-ERROR {100BBFC3C3}>.
+
+
+
+The function found around line 33 is this. In fact line 33 has the prepended #* notation I do not understand
+
+(def (function e) quit (status-code)
+  ;; (log.info "Quiting production image with status-code ~A" status-code)
+  #*((:sbcl (sb-ext:exit :abort #t :code status-code))
+     (:ccl (ccl:quit status-code))
+     (t (not-yet-implemented/crucial-api 'quit))))
