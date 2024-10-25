@@ -41,8 +41,11 @@
 Nice and basic intro to the syntax
 https://lisp-lang.org/
 
-Selected reference material, by example
+mini spec - select topics and examples
 https://lamberta.github.io/minispec/
+
+very nice place for questions and discovery
+https://lisp-docs.github.io/
 
 ** SBCL
 https://www.sbcl.org/
@@ -78,6 +81,10 @@ This will have to be loaded manually for now.
 #+end_src
 
 * Shell Operations
+
+Many people want to check out Lisp, and could justify it if they were just
+poking around, nothing serious though. I aim to make that easy. 90% of projects
+begin in shell, just poking around, I certainly have no ulterior motives.
 
 Standard shell commands should feel native. Anybody with programming/bash
 experience would be immediately at home on the CL REPL. Initially These can be simple wrappers, the goal
@@ -169,23 +176,25 @@ May still be wrapper though
 The command is not a wrapper, its function is implemented in CL
 * System Concepts
 
-lisp is built ON lisp, and when you work you will be working ON the language, there is no container,
-you are outside a set of tools building upward.
+lisp is built ON lisp, and when you work you will be working ON the language, in the image.
+You are outside a set of tools building upward. In most languages you work within the constraints of the language
+which is in turn in the operating system.
 
-In most languages you work within the constraints of the language
-which is in turn in the operating system
+Freedom, sometimes means being lost. many operations we take for granted as
+necessarily being bound together are orthogonal in CL.
+- import is independent of use
+- chdir is independent of *default-directory-defaults*
+-
+- etc.
+Many granular steps are available(required) to precisely specify the system, none of this is
+particularly verbose, but it does require a change of details to attend to. If
+something is not working as expected, I check what actions I have assumed are accomplished by some explicit command.
 
-Bewildering freedom, many operations we take for granted as together are
-entirely orthogonal in CL. import is independent of use chdir is independent of
-*default-directory-defaults* etc. Many granular steps are available to precise
-the system, none of this is particularly verbose, butit does require a change of details to attend to.
-If something is not working as expected, I check what actions I have assumed are bound.
-
-the image is not quite an OS But it almost is, and it could be. When we work on
+The running lisp image is like an OS, not quite but almost, and it could be. When we work on
 lisp we are in the image. outside the image is the OS handling multi tasking.
 The running image for us has a repl, available functions, scheduled tasks can be
 assigned. Essentially we have at our disposal a language we can take anywhere we
-want, within a single user OS that we can design to acomplish a task or
+want, within a single user OS that we can design to accomplish a task or
 behaviour. When the goal is reached, the image can be exported as is, for
 distribution.
 
@@ -201,12 +210,15 @@ is essential reading, twice.
 These tools cover far MORE than linux can acomplish with a filesystem. Clarifying
 and reducing initial friction for file and dir ops is one of the major objectives of
 this project.
+- https://github.com/Shinmera/pathname-utils
+- https://edicl.github.io/cl-fad/
+- https://github.com/Shinmera/filesystem-utils
+- XXXX
+- https://shinmera.github.io/file-attributes/
 - https://asdf.common-lisp.dev/uiop.html
 - https://osicat.common-lisp.dev/manual/osicat.html
-- https://github.com/Shinmera/pathname-utils
 - https://github.com/fosskers/filepaths
 - https://codeberg.org/fourier/ppath
-- https://shinmera.github.io/file-attributes/
 
 #+begin_src lisp
                                           ; pathname objects are not strings
@@ -574,6 +586,15 @@ use.
 #+end_src
 
 ** Scripting
+
+The UNIX command line args can be read from the variable =sb-ext:*posix-argv*=
+
+- https://web.archive.org/web/20210730202847/https://ambrevar.xyz/lisp-repl-shell/index.html
+- https://simonsafar.com/2021/lisp_scripting/
+- https://fare.livejournal.com/184127.html
+- https://atomized.org/blog/2020/07/06/common-lisp-in-practice/
+- shell wrapper https://www.cliki.net/CL-Launch
+
 *** command line args
 unix-opts
 https://github.com/libre-man/unix-opts
@@ -596,24 +617,14 @@ https://edicl.github.io/cl-ppcre/
 time
 https://local-time.common-lisp.dev/
 
-** stats and dataframes
-
-cl-ana
-https://github.com/ghollisjr/cl-ana/wiki
-
-lispstat
-https://lisp-stat.dev/
-#+begin_src lisp
-                                          ; bug on loading fix
-                                          ; Cffi path Ref: https://lists.gnu.org/archive/html/bug-guix/2020-01/msg00133.html
-  ;; (ql:quickload :lisp-stat)
-
-                                          ; usage&&&
-#+end_src
-
 ** Testing
 https://github.com/lmj/1am
 https://github.com/AccelerationNet/lisp-unit2
+** GUI
+
+clog common lisp omnificient gui
+https://rabbibotton.github.io/clog/cltt.pdf
+
 ** Logging
 https://shinmera.github.io/verbose/
 ** lparallel
@@ -748,8 +759,6 @@ https://github.com/fukamachi/mito
 in hyperspec as numbers
 https://novaspec.org/cl/12_1_Number_Concepts
 
-ML
-https://github.com/melisgl/mgl
 
 numcl, numpy clone
 https://numcl.github.io/numcl/
@@ -772,12 +781,10 @@ https://numcl.github.io/numcl/
   (numcl:transpose my-matrix)     ; Matrix transposition
 #+end_src
 
-** Pipelines
-cl ana has DOP
-https://github.com/ghollisjr/cl-ana/wiki
-memoization
-https://github.com/AccelerationNet/function-cache
 ** data structures
+
+reading
+- https://blog.djhaskin.com/blog/common-data-structures-in-common-lisp/
 
 access uniformity
 https://github.com/AccelerationNet/access/
@@ -861,7 +868,6 @@ https://asdf.common-lisp.dev/
 quicksearch
 https://github.com/lisp-maintainers/quicksearch
 
-
 package help
 symbol help
 namespace help
@@ -886,14 +892,18 @@ namespace help
 Smarter programmers than I have gone these ways, I have made this because I am a simple and silly sheep.
 
 ** Resources
-mini spec
-https://lamberta.github.io/minispec/
+
+ESSENTIAL
+
+
+syntax crash course
+https://learnxinyminutes.com/docs/common-lisp/
+
+lisp crash course
+https://cs.gmu.edu/~sean/lisp/LispTutorial.html
 
 use the cookbook
 https://lispcookbook.github.io/cl-cookbook/
-
-common lisp by example
-http://csci.viu.ca/~wesselsd/courses/csci330/code/sbcl-lisp/index.html
 
 hyperspec
 https://www.lispworks.com/documentation/HyperSpec/Front/
@@ -901,14 +911,50 @@ https://www.lispworks.com/documentation/HyperSpec/Front/
 novaspec
 https://novaspec.org/cl/
 
-awesome common lisp
+awesome common lisp list
 https://github.com/CodyReichert/awesome-cl
 
-common lisp wiki, almost every CL package
-https://www.cliki.net/
 
-&&& to zotero citations
-https://www.math.fau.de/wp-content/uploads/2020/09/Preprint-2002-40-scan.pdf
+GUIDES
+- great teacher https://stevelosh.com/blog/2018/08/a-road-to-common-lisp/
+- learn lisp the hard way https://llthw.common-lisp.dev/
+- another terser cookbook https://cl-cookbook.sourceforge.net/index.html
+- common lisp by example http://csci.viu.ca/~wesselsd/courses/csci330/code/sbcl-lisp/index.html
+- successful lisp book https://dept-info.labri.fr/~strandh/Teaching/MTP/Common/David-Lamkins/contents.html
+
+WATCHING
+- https://www.youtube.com/@the-lisper/videos
+- https://www.youtube.com/watch?v=0RQYa2XJBKU
+- https://www.youtube.com/@philipbohun740/videos
+- https://www.youtube.com/watch?v=rmUTW5QWhhM&list=PL2VAYZE_4wRJi_vgpjsH75kMhN4KsuzR_&index=2
+
+LIBRARIES
+- asdf docs https://asdf.common-lisp.dev/
+- alexandria docs https://alexandria.common-lisp.dev/draft/alexandria.html
+
+REFERENCE
+- common lisp wiki, almost every CL package https://www.cliki.net/
+- technical syntax quick reference http://clqr.boundp.org/clqr-a4-consec.pdf
+- sbcl man http://www.sbcl.org/manual
+- quicklisp links to docs https://quickref.common-lisp.net/index-per-library.html
+- quicklisp search https://quickdocs.org/
+- ql heavy hitters https://github.com/vindarel/lisp-maintainers
+- documentation redirect service http://l1sp.org/html/
+- googles lisp style guide https://google.github.io/styleguide/lispguide.xml
+- style guide http://mumble.net/~campbell/scheme/style.txt
+
+READING
+- advanced functional programming https://www2.cs.sfu.ca/CourseCentral/310/pwfong/Lisp/2/tutorial2.html
+- page 13 explained in pythoooon https://michaelnielsen.org/ddi/lisp-as-the-maxwells-equations-of-software/
+- page 13 in modern scheme https://www.gnu.org/software/mes/manual/html_node/LISP-as-Maxwell_0027s-Equations-of-Software.html
+- LOL book https://letoverlambda.com/index.cl/toc
+- blog and lisp bibliography https://simondobson.org/writing/
+- lisp nn from primitives https://woodrush.github.io/blog/posts/2022-01-16-neural-networks-in-pure-lisp.html
+- interactive programming implications https://www.n16f.net/blog/interactive-common-lisp-development/
+
+CITATIONS FOR LISP PAPERS
+- https://www.math.fau.de/wp-content/uploads/2020/09/Preprint-2002-40-scan.pdf
+&&& bring other lisp citations here!
 
 * Burrito recipie
 Lamb-duh's secret goodness
@@ -934,3 +980,34 @@ https://shinmera.github.io/depot/
 
 clml machine learning
 https://github.com/mmaul/clml
+
+cl-ana
+data frames stats and dependency oriented programming
+https://github.com/ghollisjr/cl-ana/wiki
+
+memoization
+https://github.com/AccelerationNet/function-cache
+
+ML
+https://github.com/melisgl/mgl
+
+nvidia interop
+https://github.com/takagi/cl-cuda
+
+lispstat - linear algebra - stats - plot
+https://lisp-stat.dev/
+#+begin_src lisp
+                                          ; RE bug on loading in guix
+                                          ; Cffi path Ref: https://lists.gnu.org/archive/html/bug-guix/2020-01/msg00133.html
+  ;; (ql:quickload :lisp-stat)
+
+                                          ; usage&&&
+#+end_src
+
+deep learning matrices matrices
+https://github.com/hikettei/cl-waffe2
+
+syntax modification useful for data pipelines
+https://quickref.common-lisp.net/arrows.html
+
+&&& gnu scientific library for cl
