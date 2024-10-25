@@ -6,6 +6,7 @@
 (ql:quickload :py4cl)
 (ql:quickload :str)
 (ql:quickload :file-finder)
+&&& go through readme
 
                                         ; package def
 (defpackage :click
@@ -464,6 +465,7 @@ To load "unix-in-lisp":
 
 
 The function found around line 33 is this. In fact line 33 has the prepended #* notation I do not understand
+possibly a binary reader macro
 
 (def (function e) quit (status-code)
   ;; (log.info "Quiting production image with status-code ~A" status-code)

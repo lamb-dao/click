@@ -35,7 +35,9 @@
       highlights it. As long as I enter &&& I can jump away to chase another
       idea. When the search returns nothing I can assume 99% completeness. TODO
       is broader.
+
 * Startup
+
 Nice and basic intro to the syntax
 https://lisp-lang.org/
 
@@ -151,22 +153,43 @@ It may be a wrapper, its limitations should be noted in docstring
 20. touch
 21. chmod
 22. chown
+23. ls
 
 ** Tested
 The command works as it should, if any functionality is missing it is noted in docstring.
 
 1. pwd
 2. cd
-14. ls
 
-** Portable Cannonical
-The command is not a wrapper, its function is implemented in CL
 ** Docstring is educative
 The docstring educates the user on cannonical CL approaches.
 The convenience commands should move the user toward the language.
+May still be wrapper though
+** Portable Cannonical
+The command is not a wrapper, its function is implemented in CL
 * System Concepts
-** Pathnames
 
+lisp is built ON lisp, and when you work you will be working ON the language, there is no container,
+you are outside a set of tools building upward.
+
+In most languages you work within the constraints of the language
+which is in turn in the operating system
+
+Bewildering freedom, many operations we take for granted as together are
+entirely orthogonal in CL. import is independent of use chdir is independent of
+*default-directory-defaults* etc. Many granular steps are available to precise
+the system, none of this is particularly verbose, butit does require a change of details to attend to.
+If something is not working as expected, I check what actions I have assumed are bound.
+
+the image is not quite an OS But it almost is, and it could be. When we work on
+lisp we are in the image. outside the image is the OS handling multi tasking.
+The running image for us has a repl, available functions, scheduled tasks can be
+assigned. Essentially we have at our disposal a language we can take anywhere we
+want, within a single user OS that we can design to acomplish a task or
+behaviour. When the goal is reached, the image can be exported as is, for
+distribution.
+
+** Pathnames
 
 Common Lisp is older than any of the file systems in use today, its pathname
 system is still more powerful and still relevant to every possible system. That
@@ -175,14 +198,15 @@ acomplished, some will not be intuitive.
 https://lispcookbook.github.io/cl-cookbook/files.html
 is essential reading, twice.
 
-These tools cover far MORE than linux can acomplish with a filesystem clarifying
-and reducing friction for file and dir ops is one of the major objectives of
+These tools cover far MORE than linux can acomplish with a filesystem. Clarifying
+and reducing initial friction for file and dir ops is one of the major objectives of
 this project.
 - https://asdf.common-lisp.dev/uiop.html
 - https://osicat.common-lisp.dev/manual/osicat.html
 - https://github.com/Shinmera/pathname-utils
 - https://github.com/fosskers/filepaths
 - https://codeberg.org/fourier/ppath
+- https://shinmera.github.io/file-attributes/
 
 #+begin_src lisp
                                           ; pathname objects are not strings
@@ -556,6 +580,11 @@ https://github.com/libre-man/unix-opts
 *** export binaries
 uiop&&&
 * Packages
+
+TODO dig into ciel-lang, for inspiration and spare parts and packages
+It looks like a well intentioned project but the deployment is awfull.
+https://github.com/ciel-lang/CIEL
+
 ** strings
 
 str
@@ -703,9 +732,9 @@ A high quality high perf, classic lib but docs and examples are hard to find
 ** event scheduling
 
 cl-schedule
-&&& website
+https://github.com/jcguu95/cl-schedule
 
-Initialization functions
+Initialization functions custom to click
 - on-start
 - on-target
 
@@ -819,6 +848,7 @@ https://www.quicklisp.org/beta/
 https://common-lisp-libraries.readthedocs.io/quicklisp/
 &&&note on
 (quicklisp:update-all-dists)
+&&& how to uninstal dists, check list of dists.
 
 ultralisp
 https://ultralisp.org/
@@ -885,3 +915,22 @@ Lamb-duh's secret goodness
 - where other cookbooks have gone before me, I follow with a burrito!
   - A self contained unit that conveniently wraps its contents into a delicious uniform delivery system
   - A very spicy monoid in the category of endofunctors
+
+* CLEAN
+Common Lisp Environment for Experiment and Analysis
+
+All advanced data science ML and modelling goes here
+If click is the living room clean is the laboratory
+
+I want an operating system for data science,
+deployable pipelines and experiment tracking is the goal
+
+declarative file system state
+https://github.com/Virtual-Insurance-Products/cl-sysop
+
+Depot
+file system protocol browse read write with locks and ACID safety
+https://shinmera.github.io/depot/
+
+clml machine learning
+https://github.com/mmaul/clml
