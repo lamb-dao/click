@@ -12,12 +12,12 @@
 (ql:quickload :cmd)
 (ql:quickload :py4cl)
 (ql:quickload :quicksearch)
-(ql:quickload :cl-str) ;; broken
+(ql:quickload :cl-str) ; wrong string? &&&
 (ql:quickload :cl-ppcre)
 (ql:quickload :local-time)
 (ql:quickload :1am)
 (ql:quickload :lisp-unit2)
-(ql:quickload :clog) ;; very slow on swank/gray
+;;(ql:quickload :clog) ; very slow on swank/gray, breaking repl
 (ql:quickload :verbose)
 (ql:quickload :iterate)
 (ql:quickload :cl-schedule)
