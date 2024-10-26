@@ -38,13 +38,13 @@
 
 * Startup
 
-Nice and basic intro to the syntax
+Nice intro
 https://lisp-lang.org/
 
-mini spec - select topics and examples
+Mini spec - top use topics and examples
 https://lamberta.github.io/minispec/
 
-very nice place for questions and discovery
+Questions and discovery
 https://lisp-docs.github.io/
 
 ** SBCL
@@ -213,12 +213,11 @@ this project.
 - https://github.com/Shinmera/pathname-utils
 - https://edicl.github.io/cl-fad/
 - https://github.com/Shinmera/filesystem-utils
-- XXXX
 - https://shinmera.github.io/file-attributes/
-- https://asdf.common-lisp.dev/uiop.html
 - https://osicat.common-lisp.dev/manual/osicat.html
 - https://github.com/fosskers/filepaths
 - https://codeberg.org/fourier/ppath
+- https://asdf.common-lisp.dev/uiop.html
 
 #+begin_src lisp
                                           ; pathname objects are not strings
@@ -354,8 +353,6 @@ Online commentary defining paths from root is guaranteed consistent. I just set 
   ;; ls -d
   (directory "*") ; the syntax is badly documented(online) check
 
-  ;; ls -f
-
   ;; pwd
   (uiop:getcwd)
 
@@ -396,8 +393,6 @@ Online commentary defining paths from root is guaranteed consistent. I just set 
           (format t "~A%~%" line)))
 #+end_src
 
-** System info
-https://github.com/Shinmera/machine-state/
 ** REPL and error and messages
 - editor function
   - https://lispcookbook.github.io/cl-cookbook/emacs-ide.html
@@ -411,12 +406,9 @@ https://github.com/Shinmera/machine-state/
   - (describe "string")
   - (apropos "string")
   - (documentation "string")
-- Evaluate sub statements: =,-e-c=
+- Evaluate single form in place: =,-e-c=
 
 * Syntax Concepts
-
-mini spec
-https://lamberta.github.io/minispec/
 
 ** Parentheses are just trees
 Don't look at the parens, look at the indentation and see the tree.
@@ -587,7 +579,6 @@ use.
 
 ** Scripting
 
-The UNIX command line args can be read from the variable =sb-ext:*posix-argv*=
 
 - https://web.archive.org/web/20210730202847/https://ambrevar.xyz/lisp-repl-shell/index.html
 - https://simonsafar.com/2021/lisp_scripting/
@@ -596,10 +587,16 @@ The UNIX command line args can be read from the variable =sb-ext:*posix-argv*=
 - shell wrapper https://www.cliki.net/CL-Launch
 
 *** command line args
+
+The UNIX command line args can be read from the variable =sb-ext:*posix-argv*=
+
 unix-opts
 https://github.com/libre-man/unix-opts
+
 *** export binaries
-uiop&&&
+
+(uiop/image: &&&)
+
 * Packages
 
 TODO dig into ciel-lang, for inspiration and spare parts and packages
@@ -872,6 +869,9 @@ package help
 symbol help
 namespace help
 
+search quicklisp dists for a package
+(ql:system-apropos "find-me")
+
 #+begin_src lisp
 
   ;;inspect
@@ -937,6 +937,7 @@ REFERENCE
 - technical syntax quick reference http://clqr.boundp.org/clqr-a4-consec.pdf
 - sbcl man http://www.sbcl.org/manual
 - quicklisp links to docs https://quickref.common-lisp.net/index-per-library.html
+- quicklisp catalogue https://www.quicklisp.org/beta/UNOFFICIAL/docs/
 - quicklisp search https://quickdocs.org/
 - ql heavy hitters https://github.com/vindarel/lisp-maintainers
 - documentation redirect service http://l1sp.org/html/
@@ -999,7 +1000,7 @@ https://lisp-stat.dev/
 #+begin_src lisp
                                           ; RE bug on loading in guix
                                           ; Cffi path Ref: https://lists.gnu.org/archive/html/bug-guix/2020-01/msg00133.html
-  ;; (ql:quickload :lisp-stat)
+(ql:quickload :lisp-stat) ; stats
 
                                           ; usage&&&
 #+end_src
@@ -1010,4 +1011,11 @@ https://github.com/hikettei/cl-waffe2
 syntax modification useful for data pipelines
 https://quickref.common-lisp.net/arrows.html
 
+parallel execution
+(ql:quickload :lparallel)
+
+
 &&& gnu scientific library for cl
+
+System info
+https://github.com/Shinmera/machine-state/

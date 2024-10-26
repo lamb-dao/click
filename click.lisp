@@ -1,18 +1,32 @@
 ;;;; ===================================  set environment
                                         ; imports
+
+(ql:quickload :pathname-utils)
+(ql:quickload :cl-fad)
+(ql:quickload :filesystem-utils)
+(ql:quickload :file-attributes)
+(ql:quickload :osicat)
+(ql:quickload :filepaths)
+(ql:quickload :ppath)
 (ql:quickload :cmd)
-(ql:quickload :lisp-stat)
-(ql:quickload :lparallel)
 (ql:quickload :py4cl)
+(ql:quickload :quicksearch)
+&&& go through readme at packages
 (ql:quickload :str)
 (ql:quickload :file-finder)
-&&& go through readme
+
+
+(ql:quickload :clesh)
+(use-package :named-readtables)
+(in-readtable clesh:syntax)
 
                                         ; package def
 (defpackage :click
                                         ; whole package import
-  (:use :cl :cmd :str :file-finder)
-                                        ; specific function import to this namespace, the rest are behind the :package prefix
+  (:use :cl :str :cmd :file-finder)
+                                        ; shadowing, declares dominant function
+  (:shadowing-import-from :cmd :current-directory)
+                                        ; specific function import to this namespace
   (:import-from :uiop
    :subdirectories :directory-files :getcwd)
 
@@ -27,8 +41,6 @@
    :*default-pathname-initialized*
    :*default-pathname-starts*
    ))
-
-                                        ; &&& shadowing command conflicts example
 
                                         ; enter package
 (in-package :click) ; Also enter this in the REPL!
