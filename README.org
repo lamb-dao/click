@@ -176,9 +176,28 @@ May still be wrapper though
 The command is not a wrapper, its function is implemented in CL
 * System Concepts
 
-lisp is built ON lisp, and when you work you will be working ON the language, in the image.
-You are outside a set of tools building upward. In most languages you work within the constraints of the language
-which is in turn in the operating system.
+In the core of lisp the meta circular evaluator was discovered by John Mcarthy;
+from system primitives lisp develops a self evaluator for the language, and then builds out to
+create the language. The implication of this is that lisp is built ON lisp, and
+when you work you will be working ON the language. You are outside a set of
+tools building and refining tools to move up and out. This is profoundly
+different from working in a language. For other programming scenarios we work
+within the constraints of the language. We work on one program, in a language
+which is in turn withing the operating system.
+
+When we work on lisp we are in the image. outside the image is the OS handling
+multi tasking. The running lisp image is best though of as like an OS, not
+quite, but almost. Inside the image is a place for programs, programs, we are
+not restricted to a single program. This is why the order of function
+definition doesn't matter, all the functions are compiled into the image,
+multiple programs in one document can exist within the image at one time. The
+running image for us has an interactive repl, available functions, scheduled
+tasks can be assigned, individual functions can be hot recompiled while the image
+runs. Essentially, we have at our disposal a language we can modify to fit any
+domain specific purpose, within a single user OS that we can design to
+accomplish a task or behaviour, including running multiple programs
+simultaneously. When the goal is reached, that image can be exported as is, for
+distribution. Yes that could be a simple script, an app, or a personal OS.
 
 Freedom, sometimes means being lost. many operations we take for granted as
 necessarily being bound together are orthogonal in CL.
@@ -189,14 +208,6 @@ necessarily being bound together are orthogonal in CL.
 Many granular steps are available(required) to precisely specify the system, none of this is
 particularly verbose, but it does require a change of details to attend to. If
 something is not working as expected, I check what actions I have assumed are accomplished by some explicit command.
-
-The running lisp image is like an OS, not quite but almost, and it could be. When we work on
-lisp we are in the image. outside the image is the OS handling multi tasking.
-The running image for us has a repl, available functions, scheduled tasks can be
-assigned. Essentially we have at our disposal a language we can take anywhere we
-want, within a single user OS that we can design to accomplish a task or
-behaviour. When the goal is reached, the image can be exported as is, for
-distribution.
 
 ** Importing
 
