@@ -8,13 +8,26 @@
 (ql:quickload :osicat)
 (ql:quickload :filepaths)
 (ql:quickload :ppath)
+(ql:quickload :file-finder)
 (ql:quickload :cmd)
 (ql:quickload :py4cl)
 (ql:quickload :quicksearch)
-&&& go through readme at packages
-(ql:quickload :str)
-(ql:quickload :file-finder)
-
+(ql:quickload :cl-str) ;; broken
+(ql:quickload :cl-ppcre)
+(ql:quickload :local-time)
+(ql:quickload :1am)
+(ql:quickload :lisp-unit2)
+(ql:quickload :clog) ;; very slow on swank/gray
+(ql:quickload :verbose)
+(ql:quickload :iterate)
+(ql:quickload :cl-schedule)
+(ql:quickload :mito)
+(ql:quickload :access)
+(ql:quickload :fset)
+(ql:quickload :misc-extensions) ;for gmap helper for fset
+(ql:quickload :listopia)
+(ql:quickload :jzon)
+(ql:quickload :cl-csv)
 
 (ql:quickload :clesh)
 (use-package :named-readtables)

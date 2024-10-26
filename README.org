@@ -87,7 +87,7 @@ poking around, nothing serious though. I aim to make that easy. 90% of projects
 begin in shell, just poking around, I certainly have no ulterior motives.
 
 Standard shell commands should feel native. Anybody with programming/bash
-experience would be immediately at home on the CL REPL. Initially These can be simple wrappers, the goal
+experience should be immediately at home on the CL REPL. Initially These can be simple wrappers, the goal
 is to eventually have them all in portable common lisp, and have each doc-string
 describe the canonical CL approach.
 
@@ -184,8 +184,8 @@ Freedom, sometimes means being lost. many operations we take for granted as
 necessarily being bound together are orthogonal in CL.
 - import is independent of use
 - chdir is independent of *default-directory-defaults*
--
-- etc.
+- in-package for the code is indpendent of in-package for the REPL
+- &&&
 Many granular steps are available(required) to precisely specify the system, none of this is
 particularly verbose, but it does require a change of details to attend to. If
 something is not working as expected, I check what actions I have assumed are accomplished by some explicit command.
@@ -197,6 +197,64 @@ assigned. Essentially we have at our disposal a language we can take anywhere we
 want, within a single user OS that we can design to accomplish a task or
 behaviour. When the goal is reached, the image can be exported as is, for
 distribution.
+
+** Importing
+
+&&& packages are sets of symbols
+
+&&& entering and using packages (load &&&) is not (use-package :eat-me) is not (in-package :drink-me)
+
+#+begin_src lisp
+                                           ; import and load
+   (ql:quickload :cmd)
+   (ql:quickload :file-finder)
+   (ql:quickload :str)
+
+                                           ; &&& load local file
+
+                                           ; package def
+   (defpackage :click
+                                           ; whole package import
+     ;; use cl to bring in basic functions
+     (:use :cl :str :cmd :file-finder)
+                                           ; shadowing
+     ;; in this eg file-finder and cmd conflicted for current directory, with an error
+     ;; cmd is now selected and the error no longer appears
+     (:shadowing-import-from :cmd :current-directory)
+                                           ; specific function import to this namespace
+     (:import-from :uiop
+      :subdirectories :directory-files :getcwd)
+                                           ; functions to export from the package
+     (:export
+      :pwd
+      :ls
+      :cd
+      :cat
+      :grep
+      :which
+      :echo
+      :*default-pathname-initialized*
+      :*default-pathname-starts*
+      ))
+
+                                           ; enter package
+   (in-package :click) ; Also enter this in the REPL!
+#+end_src
+
+** REPL and error and messages
+- editor function
+  - https://lispcookbook.github.io/cl-cookbook/emacs-ide.html
+
+- interact with the repl
+  - &&&
+- move around in error message
+  - &&&
+- Observe objects:
+  - (inspect "string")
+  - (describe "string")
+  - (apropos "string")
+  - (documentation "string")
+- Evaluate single form in place: =,-e-c=
 
 ** Pathnames
 
@@ -313,6 +371,9 @@ Finder functions <ff>
 - =extension== matches file extensions
 
 #+begin_src lisp
+  (ql:quickload :file-finder)
+  (use-package :file-finder)
+
                                           ;set interpretation of finder calls <fc>
   ;; and
   (finder (<ff>)(<ff>))
@@ -393,23 +454,8 @@ Online commentary defining paths from root is guaranteed consistent. I just set 
           (format t "~A%~%" line)))
 #+end_src
 
-** REPL and error and messages
-- editor function
-  - https://lispcookbook.github.io/cl-cookbook/emacs-ide.html
-
-- interact with the repl
-  - &&&
-- move around in error message
-  - &&&
-- Observe objects:
-  - (inspect "string")
-  - (describe "string")
-  - (apropos "string")
-  - (documentation "string")
-- Evaluate single form in place: =,-e-c=
-
 * Syntax Concepts
-
+Functions within functions within functions. Look inward.
 ** Parentheses are just trees
 Don't look at the parens, look at the indentation and see the tree.
 The abstract syntax tree is immediately available to the programmer and to the program
@@ -577,8 +623,9 @@ use.
   (call-clesh "Lamb" "Duh")
 #+end_src
 
-** Scripting
+** Scripting with CL
 
+*** guides
 
 - https://web.archive.org/web/20210730202847/https://ambrevar.xyz/lisp-repl-shell/index.html
 - https://simonsafar.com/2021/lisp_scripting/
@@ -588,15 +635,17 @@ use.
 
 *** command line args
 
-The UNIX command line args can be read from the variable =sb-ext:*posix-argv*=
-
 unix-opts
 https://github.com/libre-man/unix-opts
+
+The UNIX command line args can be read from the variable =sb-ext:*posix-argv*=
 
 *** export binaries
 
 (uiop/image: &&&)
 
+** &&& clojure R etc
+TODO Unified example of library interop, and program interop to minimal program with one argument for each lang
 * Packages
 
 TODO dig into ciel-lang, for inspiration and spare parts and packages
@@ -623,57 +672,12 @@ clog common lisp omnificient gui
 https://rabbibotton.github.io/clog/cltt.pdf
 
 ** Logging
+
 https://shinmera.github.io/verbose/
-** lparallel
-
-#+begin_src lisp
-                                          ; lparallel startup
-  (ql:quickload :lparallel)
-  (use-package :lparallel)
-  (setf lparallel:*kernel* (lparallel:make-kernel 8)) ;set worker threads
-
-                                          ; env setup for examples
-  (defun gt-five (x)
-    (if (> x 5)
-        x))
-
-  (defun lt-five (x)
-    (if (< x 5)
-        x))
-
-  (defparameter *mylist* '(0 1 2 3 4 5 6 7 8 9 10) )
-
-                                          ; usage
-  (pmap 'list (lambda (x) (* x x)) '(1 2 3 4))
-  (preduce #'+ #(1 2 3 4 5))
-
-  (premove '5 '(1 2 3 4 5 6 7 8 9 0))
-
-  (premove-if (lambda (x) (> x 5)) '(0 1 2 3 4 5 6 7 8 9 10))
-  (premove-if #'gt-five '(0 1 2 3 4 5 6 7 8 9 10))
-  (premove-if #'gt-five *mylist*)
-
-  (premove-if-not #'gt-five *mylist*)
-  (premove-if #'gt-five *mylist*)
-  (premove-if #'lt-five *mylist*)
-  (premove-if-not #'lt-five *mylist*)
-
-  (defun my-filter (predicate list)
-    (reduce 'nreconc
-            (lparallel:preduce-partial (lambda (acc x)
-                                         (if (funcall predicate x)
-                                             acc
-                                             (cons x acc)))
-                                       list
-                                       :initial-value nil)
-            :initial-value nil
-            :from-end t))
-
-  (my-filter #'gt-five *mylist*)
-  #+end_src
 
 ** iteration
 *** built in
+
 #+begin_src lisp
   ;;dotimes
   (dotimes (n 3)
@@ -690,6 +694,7 @@ https://shinmera.github.io/verbose/
 #+end_src
 
 *** iterate
+
 #+begin_src lisp
   (ql:quickload "iterate")
   (use-package :iterate)
@@ -725,18 +730,6 @@ https://shinmera.github.io/verbose/
                                           ; => ((1) (1 2) (1 2 3))
 #+end_src
 
-*** generators
-
-gtwiwtg - generators the way I want them generated
-https://github.com/d3v3l0/gtwiwtg
-https://cicadas.surf/cgit/colin/gtwiwtg.git/about/
-clear and modernized and documented
-
-
-series
-https://github.com/rtoy/cl-series
-A high quality high perf, classic lib but docs and examples are hard to find
-
 ** event scheduling
 
 cl-schedule
@@ -746,37 +739,15 @@ Initialization functions custom to click
 - on-start
 - on-target
 
-** types
-coalton
-https://github.com/coalton-lang/coalton/
 ** database
+
 mito
 https://github.com/fukamachi/mito
+
 ** math
+
 in hyperspec as numbers
 https://novaspec.org/cl/12_1_Number_Concepts
-
-
-numcl, numpy clone
-https://numcl.github.io/numcl/
-#+begin_src lisp
-                                          ; Creating and manipulating arrays:
-  (numcl:array '(1 2 3 4 5))  ; Create a 1D array
-  (numcl:zeros '(3 3))        ; Create a 3x3 array of zeros
-  (numcl:aref my-array 1 2)   ; Access element at row 1, column 2
-
-                                          ; Basic operations:
-  (numcl:+ (numcl:array '(1 2 3)) (numcl:array '(4 5 6)))  ; Element-wise addition
-  (numcl:* (numcl:array '(1 2 3)) 2)                       ; Scalar multiplication
-
-                                          ; Mathematical functions:
-  (numcl:sin (numcl:array '(0 (/ pi 2) pi)))  ; Element-wise sine
-  (numcl:exp (numcl:array '(0 1 2)))          ; Element-wise exponential
-
-                                          ; Linear algebra:
-  (numcl:matmul matrix1 matrix2)  ; Matrix multiplication
-  (numcl:transpose my-matrix)     ; Matrix transposition
-#+end_src
 
 ** data structures
 
@@ -796,6 +767,7 @@ listopia
 https://github.com/Dimercel/listopia
 
 *** a and p lists
+
 &&&
 
 *** hashtables
@@ -844,6 +816,7 @@ https://github.com/AccelerationNet/cl-csv
 
 xlsx
 https://github.com/defunkydrummer/lisp-xl
+on github &&& install notes
 
 ** distribution
 
@@ -865,12 +838,15 @@ https://asdf.common-lisp.dev/
 quicksearch
 https://github.com/lisp-maintainers/quicksearch
 
+search quicklisp dists for a package
+(ql:system-apropos "find-me")
+
+search everything for a package
+(quicksearch:quicksearch "find-me")
+
 package help
 symbol help
 namespace help
-
-search quicklisp dists for a package
-(ql:system-apropos "find-me")
 
 #+begin_src lisp
 
@@ -914,6 +890,7 @@ https://novaspec.org/cl/
 awesome common lisp list
 https://github.com/CodyReichert/awesome-cl
 
+&&&defacto libraries docs page
 
 GUIDES
 - great teacher https://stevelosh.com/blog/2018/08/a-road-to-common-lisp/
@@ -956,12 +933,6 @@ READING
 CITATIONS FOR LISP PAPERS
 - https://www.math.fau.de/wp-content/uploads/2020/09/Preprint-2002-40-scan.pdf
 &&& bring other lisp citations here!
-
-* Burrito recipie
-Lamb-duh's secret goodness
-- where other cookbooks have gone before me, I follow with a burrito!
-  - A self contained unit that conveniently wraps its contents into a delicious uniform delivery system
-  - A very spicy monoid in the category of endofunctors
 
 * CLEAN
 Common Lisp Environment for Experiment and Analysis
@@ -1011,11 +982,93 @@ https://github.com/hikettei/cl-waffe2
 syntax modification useful for data pipelines
 https://quickref.common-lisp.net/arrows.html
 
-parallel execution
-(ql:quickload :lparallel)
+numcl, numpy clone
+https://numcl.github.io/numcl/
+#+begin_src lisp
+                                          ; Creating and manipulating arrays:
+  (numcl:array '(1 2 3 4 5))  ; Create a 1D array
+  (numcl:zeros '(3 3))        ; Create a 3x3 array of zeros
+  (numcl:aref my-array 1 2)   ; Access element at row 1, column 2
 
+                                          ; Basic operations:
+  (numcl:+ (numcl:array '(1 2 3)) (numcl:array '(4 5 6)))  ; Element-wise addition
+  (numcl:* (numcl:array '(1 2 3)) 2)                       ; Scalar multiplication
+
+                                          ; Mathematical functions:
+  (numcl:sin (numcl:array '(0 (/ pi 2) pi)))  ; Element-wise sine
+  (numcl:exp (numcl:array '(0 1 2)))          ; Element-wise exponential
+
+                                          ; Linear algebra:
+  (numcl:matmul matrix1 matrix2)  ; Matrix multiplication
+  (numcl:transpose my-matrix)     ; Matrix transposition
+#+end_src
 
 &&& gnu scientific library for cl
 
 System info
 https://github.com/Shinmera/machine-state/
+
+** lparallel
+
+#+begin_src lisp
+                                          ; lparallel startup
+  (ql:quickload :lparallel)
+  (use-package :lparallel)
+  (setf lparallel:*kernel* (lparallel:make-kernel 8)) ;set worker threads
+
+                                          ; env setup for examples
+  (defun gt-five (x)
+    (if (> x 5)
+        x))
+
+  (defun lt-five (x)
+    (if (< x 5)
+        x))
+
+  (defparameter *mylist* '(0 1 2 3 4 5 6 7 8 9 10) )
+
+                                          ; usage
+  (pmap 'list (lambda (x) (* x x)) '(1 2 3 4))
+  (preduce #'+ #(1 2 3 4 5))
+
+  (premove '5 '(1 2 3 4 5 6 7 8 9 0))
+
+  (premove-if (lambda (x) (> x 5)) '(0 1 2 3 4 5 6 7 8 9 10))
+  (premove-if #'gt-five '(0 1 2 3 4 5 6 7 8 9 10))
+  (premove-if #'gt-five *mylist*)
+
+  (premove-if-not #'gt-five *mylist*)
+  (premove-if #'gt-five *mylist*)
+  (premove-if #'lt-five *mylist*)
+  (premove-if-not #'lt-five *mylist*)
+
+  (defun my-filter (predicate list)
+    (reduce 'nreconc
+            (lparallel:preduce-partial (lambda (acc x)
+                                         (if (funcall predicate x)
+                                             acc
+                                             (cons x acc)))
+                                       list
+                                       :initial-value nil)
+            :initial-value nil
+            :from-end t))
+
+  (my-filter #'gt-five *mylist*)
+  #+end_src
+
+** generators
+
+gtwiwtg - generators the way I want them generated
+https://github.com/d3v3l0/gtwiwtg
+https://cicadas.surf/cgit/colin/gtwiwtg.git/about/
+clear and modernized and documented
+
+
+series
+https://github.com/rtoy/cl-series
+A high quality high perf, classic lib but docs and examples are hard to find
+
+** types
+
+coalton
+https://github.com/coalton-lang/coalton/
