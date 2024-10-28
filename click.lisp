@@ -1,6 +1,8 @@
 ;;;; ===================================  set environment
                                         ; imports
 
+(ql:quickload :unix-in-lisp) ;&&& load before clesh readtables?
+
 (ql:quickload :pathname-utils)
 (ql:quickload :cl-fad)
 (ql:quickload :filesystem-utils)
@@ -12,7 +14,7 @@
 (ql:quickload :cmd)
 (ql:quickload :py4cl)
 (ql:quickload :quicksearch)
-(ql:quickload :cl-str) ; wrong string? &&&
+(ql:quickload :str)
 (ql:quickload :cl-ppcre)
 (ql:quickload :local-time)
 (ql:quickload :1am)
@@ -29,9 +31,9 @@
 (ql:quickload :jzon)
 (ql:quickload :cl-csv)
 
-(ql:quickload :clesh)
-(use-package :named-readtables)
-(in-readtable clesh:syntax)
+;(ql:quickload :clesh)
+;(use-package :named-readtables)
+;(in-readtable clesh:syntax)
 
                                         ; package def
 (defpackage :click
@@ -42,6 +44,7 @@
                                         ; specific function import to this namespace
   (:import-from :uiop
    :subdirectories :directory-files :getcwd)
+                                        ; &&& rename package and or function
 
   (:export
    :pwd
@@ -396,104 +399,3 @@ if multiple dirs are found reports the dirs at point
 type lets you drill down to a specific help type
 easter-egg (help burrito) prints the recipie
 eg system-apropos, describe, burrito etc")
-
-
-
-
-I removed all hu.dwim* packages, updated all dists,  then began install of the package of interest.
-We see it fetches the hu.dwim* and errors on the last.
-
-
-To load "unix-in-lisp":
-  Load 1 ASDF system:
-    unix-in-lisp
-; Loading "unix-in-lisp"
-...........To load "hu.dwim.walker":
-  Load 8 ASDF systems:
-    alexandria anaphora asdf closer-mop contextl
-    hu.dwim.asdf iterate metabang-bind
-  Install 7 Quicklisp releases:
-    hu.dwim.common hu.dwim.common-lisp hu.dwim.def
-    hu.dwim.defclass-star hu.dwim.syntax-sugar hu.dwim.util
-    hu.dwim.walker
-; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.syntax-sugar/2023-02-14/hu.dwim.syntax-sugar-stable-git.tgz">
-; 18.56KB
-==================================================
-19,007 bytes in 0.01 seconds (1546.79KB/sec)
-; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.common-lisp/2021-02-28/hu.dwim.common-lisp-stable-git.tgz">
-; 2.05KB
-==================================================
-2,104 bytes in 0.00 seconds (2054.69KB/sec)
-; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.common/2015-07-09/hu.dwim.common-20150709-darcs.tgz">
-; 3.01KB
-==================================================
-3,083 bytes in 0.00 seconds (3010.74KB/sec)
-; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.util/2021-12-30/hu.dwim.util-stable-git.tgz">
-; 49.65KB
-==================================================
-50,837 bytes in 0.04 seconds (1272.93KB/sec)
-; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.defclass-star/2021-12-30/hu.dwim.defclass-star-stable-git.tgz">
-; 8.90KB
-==================================================
-9,114 bytes in 0.00 seconds (0.00KB/sec)
-; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.def/2021-12-30/hu.dwim.def-stable-git.tgz">
-; 19.65KB
-==================================================
-20,120 bytes in 0.01 seconds (2183.16KB/sec)
-; Fetching #<URL "http://beta.quicklisp.org/archive/hu.dwim.walker/2022-07-07/hu.dwim.walker-stable-git.tgz">
-; 37.45KB
-==================================================
-38,345 bytes in 0.04 seconds (1069.89KB/sec)
-; Loading "hu.dwim.walker"
-..................................................
-[package hu.dwim.def].............................
-[package hu.dwim.defclass-star]...................
-[package hu.dwim.common-lisp].....................
-[package hu.dwim.common]..........................
-[package hu.dwim.syntax-sugar]....................
-[package hu.dwim.util]............................
-[package hu.dwim.util/error-reports].
-
-; file: /home/user/quicklisp/dists/quicklisp/software/hu.dwim.util-stable-git/source/miscellaneous.lisp
-; in: DEF #'IOE
-;     (METABANG.BIND:BIND #*
-;       ((:SBCL ((*EVALUATOR-MODE* :INTERPRET))))
-;       (EVAL HU.DWIM.UTIL::FORM))
-;
-; caught ERROR:
-;   during macroexpansion of
-;   (BIND #*
-;     (#)
-;     ...).
-;   Use *BREAK-ON-SIGNALS* to intercept.
-;
-;    The value
-;      #*
-;    is not of type
-;      LIST
-
-;
-; caught ERROR:
-;   READ error during COMPILE-FILE:
-;
-;     no dispatch function defined for #\t
-;
-;       Line: 33, Column: 34, File-Position: 1047
-;
-;       Stream: #<SB-INT:FORM-TRACKING-STREAM for "file /home/user/quicklisp/dists/quicklisp/software/hu.dwim.util-stable-git/source/miscellaneous.lisp" {100BB290A3}>
-;
-; compilation unit aborted
-;   caught 2 fatal ERROR conditions
-;   caught 2 ERROR conditions
-; Evaluation aborted on #<UIOP/LISP-BUILD:COMPILE-FILE-ERROR {100BBFC3C3}>.
-
-
-
-The function found around line 33 is this. In fact line 33 has the prepended #* notation I do not understand
-possibly a binary reader macro
-
-(def (function e) quit (status-code)
-  ;; (log.info "Quiting production image with status-code ~A" status-code)
-  #*((:sbcl (sb-ext:exit :abort #t :code status-code))
-     (:ccl (ccl:quit status-code))
-     (t (not-yet-implemented/crucial-api 'quit))))

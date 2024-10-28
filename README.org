@@ -1,5 +1,6 @@
 * CLICK
-  Common Lisp Interactive Control Kit
+
+Command Line Interface Common Kit
 
   - Purpose
     - CLICK answers the question: what 20%  does 80% of the work?
@@ -7,12 +8,20 @@
       - operations
       - packages
     - CLICK serves as an on ramp to CL concepts by assuming prior linux and programming knowledge
-      - Setup, discovery and productivity is a significant hinderance, but only initially.
-      - Getting over this bump to the good stuff of Common Lisp should be made butttery smooth, its worth it.
-    - CLICK butters daily tasks, such that the REPL becomes substantially easier than terminal
+      - Only the initial setup and discovery of a CL environment is an obstacle.
+      - Getting over this bump to the good stuff of Common Lisp should be made butttery smooth, it is worth it.
+      - Assuming that users interested in CL have prior bash knowledge, is the key
+    - CLICK butters daily tasks, such that the REPL becomes easier than terminal
       - So that projects can begin in the REPL and then grow into their potential
       - To prevent the all to common nightmare where a quick-experiment in bash becomes a monster
-      - Assumes that users begin with bash knowledge
+
+      CLICK is not meant to be a comprehensive introduction, or the ultimate
+      library. These are my opinionated selections and most used examples that get
+      me productive and learning through use. I enjoy the sprawling options and
+      obscure tools that common lisp provides, but a focused on-boarding would
+      have helped immensely.
+
+      This is a Work In Progress
 
   - Future Contents
     - readme with basic linux operations especially notes on paths/dirs/files/fileio
@@ -23,58 +32,100 @@
     - everything you need in the first full week of using CL
     - anything you need everyday
 
-      CLICK is not meant to be a comprehensive introduction, or the ultimate
-      library. It is opinionated selections and most used examples that get
-      me productive and learning through use. I Love the sprawling options and
-      obscure tools that common lisp provides, but a focused on-boarding would
-      have helped me immensely in my first year.
-
-      This is a Work In Progress
-
       Note: let &&& be "right here completion needed" My default search
       highlights it. As long as I enter &&& I can jump away to chase another
-      idea. When the search returns nothing I can assume 99% completeness. TODO
-      is broader.
+      idea. When the search returns nothing I can assume 99% completeness.
 
 * Startup
 
 Nice intro
 https://lisp-lang.org/
 
-Mini spec - top use topics and examples
+Mini spec - most used topics and examples
 https://lamberta.github.io/minispec/
 
 Questions and discovery
 https://lisp-docs.github.io/
 
 ** SBCL
+
+steel bank common lisp
 https://www.sbcl.org/
-TODO install guide
+
+install from command line
+#+begin_src bash
+sudo apt-get install sbcl
+#+end_src
+
 ** lem
+
 https://github.com/lem-project/lem/
 TODO install guide
-** quicklisp and ultralisp
 
-quicklisp
+** quicklisp
+
 https://www.quicklisp.org/beta/
-TODO install guide
 
-ultralisp
+install from command line
+#+begin_src bash
+curl -o /tmp/quick.lisp http://beta.quicklisp.org/quicklisp.lisp
+sbcl --no-sysinit --no-userinit --load /tmp/quick.lisp \
+       --eval '(quicklisp-quickstart:install :path "~/quicklisp")' \
+       --eval '(ql:add-to-init-file)' \
+       --quit
+#+end_src
+
+** ultralisp
+
 https://ultralisp.org/
 
-(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)
-(ql:update-dist "ultralisp")
-TODO install guide
+install from command line
+#+begin_src bash
+sbcl --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)' --quit
+#+end_src
 
-** pull this package
+** unix-in-lisp
+
+https://github.com/PuellaeMagicae/unix-in-lisp
+
+&&& install unix-in-lisp before evaluating clesh readtable?
+
+clone the repo
+#+begin_src bash
+git clone https://github.com/PuellaeMagicae/unix-in-lisp ~/quicklisp/local-projects/unix-in-lisp/
+#+end_src
+
+dependencies are on ultralisp
+#+begin_src lisp
+(ql:quickload "unix-in-lisp")
+#+end_src
+
+for better SLIME integration. To load it, evaluate in emacs.
+You may want to add this line to your init.el
+#+begin_src lisp
+(require 'unix-in-slime "~/quicklisp/local-projects/unix-in-lisp/unix-in-slime")
+#+end_src
+
+to start a listener =M-x unix-in-sime=
+
+unix-in-slime installs hacks to the host Lisp environment by calling
+=(unix-in-lisp:install)=
+on startup. To undo hacks done to the host environment
+and unmount Unix FS packages, run
+=(unix-in-lisp:uninstall)=
+
+This may replace all the functions below,
+working on a function that deploys and starts
+
+** load CLICK
 
 TODO upload to ultralisp.
 This will have to be loaded manually for now.
 #+begin_src bash
-  cd ~/quicklisp/local-projects/
-  git clone https://github.com/lamb-duh/click
+  git clone https://github.com/lamb-duh/click ~/quicklisp/local-projects/click
 #+end_src
 
+evaluate &&& how to open the editor &&& how to eval
 #+begin_src lisp
     (ql:quickload :click)
     (usepackage :click)
@@ -92,32 +143,6 @@ is to eventually have them all in portable common lisp, and have each doc-string
 describe the canonical CL approach.
 
 Commands are moved through the sections as they are worked on.
-
-** unix-in-lisp
-
-This may replace all the functions below,
-https://github.com/PuellaeMagicae/unix-in-lisp
-
-clone the repo
-git clone https://github.com/PuellaeMagicae/unix-in-lisp ~/quicklisp/local-projects/unix-in-lisp/
-
-dependencies are on ultralisp
-(ql:quickload "unix-in-lisp")
-errors!!!
-
-working on a function that deploys and starts
-
-It’s recommended to load unix-in-slime.el for better SLIME integration. To load it, evaluate
-in emacs. You may want to add this line to your init.el
-(require 'unix-in-slime "~/quicklisp/local-projects/unix-in-lisp/unix-in-slime")
-
-to start a listener, and have fun! =M-x unix-in-sime=
-
-unix-in-slime installs hacks to the host Lisp environment by calling
-=(unix-in-lisp:install)=
-on startup. To undo hacks done to the host environment
-and unmount Unix FS packages, run
-=(unix-in-lisp:uninstall)=
 
 ** Planned
 
@@ -639,7 +664,7 @@ use.
 
 *** guides
 
-- https://web.archive.org/web/20210730202847/https://ambrevar.xyz/lisp-repl-shell/index.html
+-  sly adapted as shell https://web.archive.org/web/20210730202847/https://ambrevar.xyz/lisp-repl-shell/index.html
 - https://simonsafar.com/2021/lisp_scripting/
 - https://fare.livejournal.com/184127.html
 - https://atomized.org/blog/2020/07/06/common-lisp-in-practice/
@@ -832,17 +857,26 @@ on github &&& install notes
 
 ** distribution
 
-quicklisp
+*** quicklisp
+
 https://www.quicklisp.org/beta/
 https://common-lisp-libraries.readthedocs.io/quicklisp/
+
+check installed dists
+(ql-dist:all-dists)
+
 &&&note on
 (quicklisp:update-all-dists)
-&&& how to uninstal dists, check list of dists.
 
-ultralisp
+&&& how to uninstal dists
+&&&reinstall dists
+
+*** ultralisp
+
 https://ultralisp.org/
 
-asdf
+*** asdf
+
 https://asdf.common-lisp.dev/
 
 * Help
@@ -850,30 +884,28 @@ https://asdf.common-lisp.dev/
 quicksearch
 https://github.com/lisp-maintainers/quicksearch
 
-search quicklisp dists for a package
-(ql:system-apropos "find-me")
-
-search everything for a package
-(quicksearch:quicksearch "find-me")
+TODO (help) and (help "symbol")
+should be an interactive menu describing the options/ letting user go on to any or all sub
+(help "help") should go give detailed descriptions of each  option
 
 package help
 symbol help
 namespace help
 
 #+begin_src lisp
+  ;;search quicklisp dists for a package
+  (ql:system-apropos "find-me")
+  ;;search all dists and github for a package
+  (quicksearch:quicksearch "find-me")
 
   ;;inspect
-  ;;(inspect "string")
+  (inspect "string")
   ;;describe
-  ;;(describe "string")
+  (describe "string")
   ;;apropos
-  ;;(apropos "string")
+  (apropos "string")
   ;;documentation
-  ;;(documentation "string")
-
-  ;;(help) and (help "symbol")
-  ;; should be an interactive menu describing the options/ letting user go on to any or all sub
-  ;; (help "help") should go give detailed descriptions of each  option
+  (documentation "string")
 #+end_src
 
 ** Acknowledgements
@@ -902,7 +934,25 @@ https://novaspec.org/cl/
 awesome common lisp list
 https://github.com/CodyReichert/awesome-cl
 
-&&&defacto libraries docs page
+defacto libraries docs page
+https://common-lisp-libraries.readthedocs.io/
+- asdf - Build System
+- alexandria - Commonly Used Utilities
+- bordeaux-threads - Threading
+- cl-ppcre - Regular Expressions
+- cl-who - DSL for Markup
+- fiveam - Regression Testing Framework
+- hunchentoot - Web Server
+- iterate - Psuedocodic Iteration
+- local-time - Date and Time Manipulation
+- postmodern - PostgreSQL programming interace
+- quicklisp - Library Manager
+- usocket - Universal Socket Library
+- utilities - A collection of utility libraries
+- numcl - Lispy clone of numpy
+- unix-opts - cmd line argument parser
+
+
 
 GUIDES
 - great teacher https://stevelosh.com/blog/2018/08/a-road-to-common-lisp/
