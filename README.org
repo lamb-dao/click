@@ -84,11 +84,41 @@ install from command line
 sbcl --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)' --quit
 #+end_src
 
+&&& dist order
+
 ** unix-in-lisp
 
 https://github.com/PuellaeMagicae/unix-in-lisp
 
 &&& install unix-in-lisp before evaluating clesh readtable?
+
+libfixposix prereq
+https://github.com/sionescu/libfixposix
+
+#+begin_src bash
+            mkdir ~/build-lfp
+            git clone https://github.com/sionescu/libfixposix ~/build-lfp
+
+          require:
+          Xautoconf-2.67,
+          Xautomake-1.10,
+          Xlibtool-2.2.6b,
+          Xpkg-config
+          check
+
+            cd ~/build-lfp
+            autoreconf -i -f
+
+            mkdir build
+            cd build
+            ../configure
+            make
+            make install
+
+            #rm -r ~/build-lfp
+#+end_src
+
+
 
 clone the repo
 #+begin_src bash
