@@ -370,14 +370,6 @@ if :p is nil then the evaluated string is returned from the pf form. ie. it is t
 if :t is set to X then the format operator is ~X
 "(&&&))
 
-(defun find-dir (&key (root "/") &rest )
-  "Finds a single directory
-takes and applies a sequence of (directory strings)
-elegant error cases:
-if none are found to match reports the last arg with a find
-if multiple dirs are found reports the dirs at point
-:root defaults to from root
-")
 
 (defun finder-logic (find &key (root #P"/") (test nil) (retype #F))
   "Using a set of string keys collects a set of file paths as strings"
@@ -399,3 +391,94 @@ if multiple dirs are found reports the dirs at point
 type lets you drill down to a specific help type
 easter-egg (help burrito) prints the recipie
 eg system-apropos, describe, burrito etc")
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+                                        ; build find dir
+
+(ql:quickload :fuzzy-match)
+(ql:quickload :iterate)
+
+(defun directory-depth (&optional (depth 1) (paths '(#P"/")))
+  "Takes a list of paths as roots, and returns a list of paths of all dirs to depth below the roots"
+  (if (<= depth 0) ; base case 0 will go no deeper, returns paths arg back up to recursive call
+      (remove-duplicates paths); return paths
+      (let ((subdirectories (remove-duplicates (alexandria:flatten (mapcar #'uiop:subdirectories paths))
+                                               :test #'equal)))
+        (remove-duplicates (append paths (remove-duplicates (directory-depth (1- depth) subdirectories)
+                                         :test #'equal))))))
+
+(defun find-dir (&key
+                   (n-test 1 n-testp)
+                   (show nil)
+                   (n-keep  1)
+                   (keep *)
+                   (n-drop 0)
+                   (drop null effect)
+                   (depth 3)
+                   (root '(#P"/")))
+  " digs into dir tree, fuzzy filters directories, can be applied to its own output
+
+  ;;arg : default : description
+  n-test n : any : how many must be in output list, error if not
+  show : nil : noisy reporting for interactive purposes
+  n-keep  : 1 : how many to keep from the top of keep sorted list
+  keep : * : fuzzy string to sort by after drops are done
+  n-drop : 0 : how many to drop from top of drop sorted list
+  drop : null effect : fuzzy string to sort
+  depth : 3 : how deep to search below root
+  root : '(#P\"/\") : a set of paths in #P or string form "
+
+  (let* ((dirs (directory-depth depth root))
+         (&&& drops)
+         (&&& keeps)
+         (&&&))))
+
+(find-dir ())
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;scratch
+(namestring (user-homedir-pathname))
+(namestring #P"/home/user/")
+(namestring "/home/user/")
+                                        ; => path to string
+
+(pathname (user-homedir-pathname))
+(pathname #P"/home/user/")
+(pathname "/home/user/")
+                                        ; => string to path
+
+(uiop:subdirectories (user-homedir-pathname))
+(uiop:subdirectories #P"/home/user/")
+(uiop:subdirectories "/home/user/")
+(uiop:subdirectories "/home/user")
+                                        ;=> all equivalent
+
+(defparameter *one-dir* '(#P"/home/user/"))
+(defparameter *two-dir* '(#P"/home/user/" #P"/home/user/"))
+(defparameter *some-paths* '(#P"/proc/96/" #P"/proc/962/" #P"/proc/966/" #P"/proc/97/" #P"/proc/972/"
+                             #P"/proc/97988/" #P"/proc/983/" #P"/proc/987/" #P"/proc/99/" #P"/proc/990/"
+                             #P"/proc/994/" #P"/proc/acpi/" #P"/proc/asound/" #P"/proc/bus/"
+                             #P"/proc/driver/" #P"/proc/dynamic_debug/" #P"/proc/fs/" #P"/proc/irq/"
+                             #P"/proc/net/" #P"/proc/pressure/" #P"/proc/scsi/" #P"/proc/self/"
+                             #P"/proc/sys/" #P"/proc/sysvipc/" #P"/proc/thread-self/" #P"/proc/tty/"
+                             #P"/run/NetworkManager/" #P"/run/alsa/" #P"/run/avahi-daemon/"
+                             #P"/run/blkid/" #P"/run/chrony-dhcp/" #P"/run/chrony/"
+                             #P"/run/console-setup/" #P"/run/containerd/" #P"/run/credentials/"
+                             #P"/run/cryptsetup/" #P"/run/cups/" #P"/run/dbus/" #P"/run/docker/"
+                             #P"/run/gdm3/" #P"/run/initramfs/" #P"/run/lock/" #P"/run/log/"
+                             #P"/run/lvm/" #P"/run/motd.d/" #P"/run/mount/" #P"/run/network/"))
+(let ((a 3)) a) ; => 3
+
+(directory-depth 0 `(,*default-pathname-defaults*))
+(directory-depth 0 `(,( user-homedir-pathname)))
+
+(fuzzy-match:fuzzy-match input suggestions :suggestions-display suggestions-display)
+(fuzzy-match:fuzzy-match *some-paths* suggestions :suggestions-display suggestions-display)
