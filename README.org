@@ -379,6 +379,7 @@ Override default-pathname-defaults
 
 ** directory
 
+&&& change this section to introduce find-dir
 #+begin_src lisp
   (cd "/")
   (directory "*") ;=> dirs here
@@ -481,12 +482,29 @@ Online commentary defining paths from root is guaranteed consistent. I just set 
   ;; ls -d
   (directory "*") ; the syntax is badly documented(online) check
 
+  (uiop:subdirectories (user-homedir-pathname))
+  (uiop:subdirectories #P"/home/user/")
+  (uiop:subdirectories "/home/user/")
+
   ;; pwd
   (uiop:getcwd)
 
   ;; cd
   (uiop:chdir #P"/path/name")
   (setf *default-pathname-defaults*(uiop:getcwd))
+
+
+  ;; path to string
+  (namestring "/home/user/")
+  (namestring "#P/home/user/")
+  (namestring (user-homedir-pathname))
+
+  ;; string to path
+  (pathname "/home/user/")
+  (pathname #P"/home/user/")
+  (pathname (user-homedir-pathname))
+
+
 #+end_src
 
 ** File Operations
@@ -494,6 +512,8 @@ Online commentary defining paths from root is guaranteed consistent. I just set 
 #+begin_src lisp
   ;; ls -f
   (directory-files &&&)
+
+  ;; &&& move rename delete
 #+end_src
 
 ** File IO
@@ -578,8 +598,63 @@ A: It is just a tree, code is data, data is code.
 
 ** defparameter vs defvar
 Clarify which is immutable
-** functions
 ** args
+
+#+begin_src lisp
+  ;; arguments
+  ;ordered binding
+  (defun example-function (required &optional (optional-arg nil optional-arg-supplied-p))
+    (if optional-arg-supplied-p
+        (format t "Optional argument was supplied: ~A~%" optional-arg)
+        (format t "Optional argument was not supplied~%")))
+  ; :keyword binding
+  (defun example-function (&key (keyword-arg nil keyword-arg-supplied-p))
+    (if keyword-arg-supplied-p
+        (format t "Keyword argument was supplied: ~ A~%" keyword-arg)
+        (format t "Keyword argument was not supplied~%")))
+
+  ;; &&& note on the undefined combination ? &optional &rest
+  ;; &&& &rest &body etc
+#+end_src
+
+** functions
+
+#+begin_src lisp
+;; local functions
+(defun example-flet ()
+  (flet ((local-func (x) (* x 2)))
+    (local-func 5)))
+
+(defun example-labels ()
+  (labels ((a () (print "In A")))
+    (a)))
+
+(defun example-labels-mutual ()
+  (labels ((a () (print "In A"))
+           (b () (a)))
+    (b)))
+#+end_src
+
+** returns
+
+#+begin_src lisp
+;; let return
+(let ((a 3)) a) ; => 3
+#+end_src
+
+** errors
+
+#+begin_src lisp
+;;simple errors
+(error "This is an error message")
+(error "Problem with x=~D and y=~S" x y)
+;;specific error types:
+(signal 'type-error (list :expected-type 'number :datum "not a number"))
+;;For custom errors, define a condition and use `error` with it:
+(define-condition my-custom-error (error) ())
+(error 'my-custom-error)
+#+end_src
+
 ** quoting data
 ** logic
 ** control
@@ -724,6 +799,10 @@ https://github.com/ciel-lang/CIEL
 str
 https://github.com/vindarel/cl-str
 
+(str:split " " "hello world") ; => ("hello" "world")
+(str:replace-all old new string)
+(str:lines &&&)
+
 regex
 https://edicl.github.io/cl-ppcre/
 
@@ -761,6 +840,8 @@ https://shinmera.github.io/verbose/
 #+end_src
 
 *** iterate
+
+https://iterate.common-lisp.dev
 
 #+begin_src lisp
   (ql:quickload "iterate")
