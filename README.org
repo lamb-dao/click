@@ -500,6 +500,7 @@ Online commentary defining paths from root is guaranteed consistent. I just set 
   (namestring (user-homedir-pathname))
 
   ;; string to path
+  (pathname "/home/user")
   (pathname "/home/user/")
   (pathname #P"/home/user/")
   (pathname (user-homedir-pathname))

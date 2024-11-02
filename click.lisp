@@ -1,7 +1,6 @@
 ;;;; ===================================  set environment
                                         ; imports
 
-(ql:quickload :unix-in-lisp) ;&&& load before clesh readtables?
 
 (ql:quickload :pathname-utils)
 (ql:quickload :cl-fad)
@@ -22,15 +21,25 @@
 ;;(ql:quickload :clog) ; very slow on swank/gray, breaking repl
 (ql:quickload :verbose)
 (ql:quickload :iterate)
-(ql:quickload :cl-schedule)
-(ql:quickload :mito)
+;;(ql:quickload :cl-schedule) errors
+;;(ql:quickload :mito) errors
 (ql:quickload :access)
-(ql:quickload :fset)
+;;(ql:quickload :fset) errors
 (ql:quickload :misc-extensions) ;for gmap helper for fset
 (ql:quickload :listopia)
-(ql:quickload :jzon)
+;;(ql:quickload :jzon) ;; bad string
 (ql:quickload :cl-csv)
 (ql:quickload :fuzzy-match) ; for find-dir filtering
+
+
+;; TODO get these working
+(ql:quickload :clog) ; very slow on swank/gray, breaking repl
+(ql:quickload :cl-schedule) errors
+(ql:quickload :mito) errors
+(ql:quickload :fset) errors
+(ql:quickload :jzon) ;; bad string
+
+(ql:quickload :unix-in-lisp) ;&&& load before clesh readtables?
 
 ;(ql:quickload :clesh)
 ;(use-package :named-readtables)
@@ -105,50 +114,52 @@
 ;;;; ==================================== file system utilities
 
 (defun directory-depth (&optional (depth 1) (paths '(#P"/")))
-  "Takes a list of paths as roots, and returns a list of paths of all dirs to depth below the roots"
-  ;; (directory-depth 1 `(,*default-pathname-defaults*))
-  ;; (directory-depth 1 `(,( user-homedir-pathname)))
-  ;; (directory-depth 1 '("/home/user/"))
-  ;; (directory-depth 0 '("/home/user/"))
-  ;; &&& still returns root as string, apply pathname to list of paths
-  ;; &&& better example calls
-
-  (if (<= depth 0) ; base case 0 will go no deeper, returns paths back up to recursive call
-      (remove-duplicates paths); return just paths
+  "Takes a list of paths or a path as search roots, and returns a deduplicated list of paths of all dirs to depth below the roots that exist"
+;; (directory-depth 1 `(,*default-pathname-defaults*))
+;; (directory-depth 1 `(,(user-homedir-pathname)))
+;; (directory-depth 1 '("/home/user/" "barfoo"))
+;; (directory-depth 1 '("/home/user/"))
+;; (directory-depth 0 '("/home/user/"))
+;; (directory-depth 0 '("/home/user"))
+                                        ; make real path, check it exists
+                                        ; drop dups
+  (let ((good-paths (remove-duplicates (remove-if #'null (mapcar #'uiop:directory-exists-p paths)))))
+   (if (<= depth 0) ; base case 0 will go no deeper, returns paths back up to recursive call
+      good-paths; return just paths
                                         ; nested list of subdirs
                                         ; flatten list
                                         ; drop dups
                                         ; assign
-      (let ((subdirectories (remove-duplicates (alexandria:flatten (mapcar #'uiop:subdirectories paths))
+      (let ((subdirectories (remove-duplicates (alexandria:flatten (mapcar #'uiop:subdirectories good-paths))
                                                :test #'equal)))
                                         ; recursive call into subdirectories
                                         ; drop dups
                                         ; add paths of this call to recursive result
                                         ; drop dups
                                         ; return
-        (remove-duplicates (append paths (remove-duplicates (directory-depth (1- depth) subdirectories)
-                                         :test #'equal))))))
+        (remove-duplicates (append good-paths (remove-duplicates (directory-depth (1- depth) subdirectories)
+                                         :test #'equal)))))))
 
 (defun find-dir (&key
                    (root '(#P"/"))
                    (depth 0)
                    (keep "*")
                    (drop nil drop-supplied-p)
-                   (show nil)
+                   (report nil)
                    (n-test 1 n-test-supplied-p))
-  "Digs into directory tree, fuzzy filters directories, can be sequentially applied to its own output.
+  "takes a list of paths and fuzzy filters directories, if dept is set descends into directory tree,can be sequentially applied to its own output.
 
-  arg : default : description
-  root : '(#P\"/\") : list with a path or paths in #P or string form
-  depth : 0 : an integer for retrieval depth, searches below roots, 0 goes no deeper to filter root list
-  keep : all : space delimited words to separately(additive) fuzzy filter in
-  drop : none : space delimited words to separately(additive) fuzzy filter out, applied after keep
-  show : none : set true for reporting on processing, big ass reports if depth is heavy
+  arg : default action : description
+  root : '(#P\"/\") : a list with paths or a path in #P or string form
+  depth : 0 : an integer for retrieval depth below roots, default 0 goes no deeper for filtering root list
+  keep : all : space delimited words to separately(additive to set) fuzzy filter in
+  drop : none : space delimited words to separately(additive to set) fuzzy filter out, applied after keep
+  report : none : set true for reporting on processing, big ass reports if depth is large
   n-test : off : integer for required num of paths in output list, error and report if not "
-  ;; (find-dir :keep "lib opt" :drop "etc lib gnu")
-  ;; (find-dir :n-test 6 :keep "opt" :drop "gnu"  )
-  ;; (find-dir :depth 0 :drop "chrome" :root (find-dir :n-test 6 :keep "opt" :drop "gnu"  ))
-  ;; &&& better example calls
+  ;; (find-dir :keep "lib opt" :drop "etc lib gnu" :depth 2)
+  ;; (find-dir :report t :keep "lib opt" :drop "etc lib gnu" :depth 2)
+  ;; (find-dir :n-test 6 :depth 3 :keep "opt" :drop "gnu"  )
+  ;; (find-dir :drop "chrome" :root (find-dir :depth 2 :keep "opt" :drop "gnu"))
   (flet ((find-sets (dirs str)
            (let ((sets '())
                  (set-list (str:split " " str)))
@@ -172,7 +183,7 @@
                  (show-dirs "KEEPS" keep keeps)
                  (show-dirs "DROPS" drop drops)
                  (show-dirs "FINAL" "" final)))
-        (when show (print-report))
+        (when report (print-report))
         (when n-test-supplied-p
           (unless (= n-test (length keeps))
             (print-report)
@@ -481,6 +492,45 @@ eg system-apropos, describe")
 (exit)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;build
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;scratch
 
+
+(mapcar #'uiop:directory-exists-p '("/home/user" "home" "/home" #p"/home" "lskdjf"))
+;; => (#P"/home/user/" NIL #P"/home/" #P"/home/" NIL)
+
+(remove-if #'null '(#P"/home/user/" NIL #P"/home/" #P"/home/" NIL))
+;; => (#P"/home/user/" #P"/home/" #P"/home/")
+
+(remove-duplicates '(#P"/home/user/" #P"/home/" #P"/home/"))
+
+(remove-duplicates (remove-if #'null (mapcar #'uiop:directory-exists-p paths)))
+
+In common lisp how do I drop nils from a list
+
+
+In Common Lisp, you can remove nil values from a list using the `remove` function. Here's a concise way to do it:
+
+```lisp
+(remove nil '(1 nil 2 nil 3 4 nil))
+```
+
+This will return `(1 2 3 4)`.
+
+If you want to modify the original list, you can use `delete` instead:
+
+```lisp
+(delete nil '(1 nil 2 nil 3 4 nil))
+```
+
+Both `remove` and `delete` can also be used with `#'null` as the test:
+
+```lisp
+(remove-if #'null '(1 nil 2 nil 3 4 nil))
+```
+
+This approach is more general and can be useful in certain contexts.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;reference
+
+
+(uiop:directory-exists-p "/home/user") ; => to path and with trailing slash or nil
