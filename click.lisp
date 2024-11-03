@@ -147,7 +147,7 @@
                    (drop nil drop-supplied-p)
                    (report nil)
                    (n-test 1 n-test-supplied-p))
-  "takes a list of paths and fuzzy filters directories, if dept is set descends into directory tree,can be sequentially applied to its own output.
+  "takes a list of paths and fuzzy filters directories, if depth is set it descends into directory tree,can be sequentially applied to its own output.
 
   arg : default action : description
   root : '(#P\"/\") : a list with paths or a path in #P or string form
@@ -185,7 +185,7 @@
                  (show-dirs "FINAL" "" final)))
         (when report (print-report))
         (when n-test-supplied-p
-          (unless (= n-test (length keeps))
+          (unless (= n-test (length final))
             (print-report)
             (error "In find-dir incorrect number of directories~%expected: ~D found: ~D~%" n-test (length keeps))))
         ;;return
@@ -462,20 +462,6 @@ if :t is set to X then the format operator is ~X
 "(&&&))
 
 
-(defun finder-logic (find &key (root #P"/") (test nil) (retype #F))
-  "Using a set of string keys collects a set of file paths as strings"
-  ;;&&& a finder macro that takes key args :root :find :test :retype
-  ;; :root must be a single dir of type #P
-  ;; :test Defaults to nil. When true test the call. Testing prints the matches but return nil. Using is silent returns the matches.
-  ;; :type sets return type from {#F #P string}, defaults to #F
-
-  ;; :find '(<set)
-  ;; where <set> can be (and (not (or <arg> ... <arg>))) or other set operations in arbitrary composition
-  ;; where <arg> can be from finder syntax
-
-  ;; prepare find string
-  (with-current-directory root (&&&))
-  )
 
 (defun help (type)
   "&&& display a message that makes help and system info discoverable
@@ -492,45 +478,6 @@ eg system-apropos, describe")
 (exit)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;build
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;scratch
 
-
-(mapcar #'uiop:directory-exists-p '("/home/user" "home" "/home" #p"/home" "lskdjf"))
-;; => (#P"/home/user/" NIL #P"/home/" #P"/home/" NIL)
-
-(remove-if #'null '(#P"/home/user/" NIL #P"/home/" #P"/home/" NIL))
-;; => (#P"/home/user/" #P"/home/" #P"/home/")
-
-(remove-duplicates '(#P"/home/user/" #P"/home/" #P"/home/"))
-
-(remove-duplicates (remove-if #'null (mapcar #'uiop:directory-exists-p paths)))
-
-In common lisp how do I drop nils from a list
-
-
-In Common Lisp, you can remove nil values from a list using the `remove` function. Here's a concise way to do it:
-
-```lisp
-(remove nil '(1 nil 2 nil 3 4 nil))
-```
-
-This will return `(1 2 3 4)`.
-
-If you want to modify the original list, you can use `delete` instead:
-
-```lisp
-(delete nil '(1 nil 2 nil 3 4 nil))
-```
-
-Both `remove` and `delete` can also be used with `#'null` as the test:
-
-```lisp
-(remove-if #'null '(1 nil 2 nil 3 4 nil))
-```
-
-This approach is more general and can be useful in certain contexts.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;reference
-
-
-(uiop:directory-exists-p "/home/user") ; => to path and with trailing slash or nil

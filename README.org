@@ -377,99 +377,105 @@ Override default-pathname-defaults
     (print (uiop:getcwd)))
 #+end_src
 
-** directory
+** find-dir
 
-&&& change this section to introduce find-dir
+  find-dir takes a list of paths and fuzzy filters directories, if depth is set it descends into directory tree,can be sequentially applied to its own output.
+
+  arg : default action : description
+  root : '(#P\"/\") : a list with paths or a path in #P or string form
+  depth : 0 : an integer for retrieval depth below roots, default 0 goes no deeper for filtering root list
+  keep : all : space delimited words to separately(additive to set) fuzzy filter in
+  drop : none : space delimited words to separately(additive to set) fuzzy filter out, applied after keep
+  report : none : set true for reporting on processing, big ass reports if depth is large
+  n-test : off : integer for required num of paths in output list, error and report if not "
+
 #+begin_src lisp
-  (cd "/")
-  (directory "*") ;=> dirs here
 
-  (directory "*/**") ;=> lots! no files
-  (directory "*/**/") ;very slow or no return
+            (find-dir :keep "lib opt" :drop "etc lib gnu" :depth 2)
+            (find-dir :report t :keep "lib opt" :drop "etc lib gnu" :depth 2)
+            (find-dir :n-test 6 :depth 3 :keep "opt" :drop "gnu"  )
+            (find-dir :drop "chrome"
+                      :root (find-dir :depth 2
+                                      :keep "opt"
+                                      :drop "gnu"))
 
-  (directory "bulk-1/*") ;=> dirs in bulk-1
-  (directory "/bulk-1/*") ;=> dirs in bulk-1
-  (directory "bulk-1/*/") ;=> dirs in bulk-1
-  (directory "/bulk-1/*/") ;=> dirs in bulk-1
-  (directory "bulk-1/**") ;=> dirs in bulk-1
-  (directory "/bulk-1/**") ;=> dirs in bulk-1
-                                          ; conclusion
-                                          ; preceeding / does not matter
 
-  (directory "bulk-1/**/") ;=> all dirs below bulk-1
-  (directory "bulk-1/**/*") ;=> all dirs below bulk-1 and some dotfiles
-  (directory "bulk-1/**/*.*") ;=> lots of files below bulk-1 no tif, may be past context
-  (directory "bulk-1/**/*.tif") ;=> all tif below bulk-1
-                                          ; conclusion
-                                          ; * is / delimited wildcard but not files
-                                          ; ** is path wildcard
-                                          ; . is special at end
-
-  (directory "bulk-1/**/*UNMERGED") ;=> one match
-  (directory "bulk-1/**/*UNMERGED/") ;=> NIL
-  (directory "bulk-1/**/*COPY") ; one match
-  (directory "bulk-1/**/*COPY/") ;=> NIL
-
-  (directory "bulk-1/**/*UNMERGED/**") ;=> NIL
-  (directory "bulk-1/**/*UNMERGED/**/") ;=> NIL
-  (directory "bulk-1/**/*UNMERGED/*.*") ;=> NIL
-  (directory "bulk-1/**/*UNMERGED/**/*.*") ;=> NIL
-
-  (directory "**/*.tif") ;all tif
-  (directory "**/tiles/**/*.tif")
-  (directory "**/indicies/**/*.tif")
 #+end_src
 
 ** finder
 https://github.com/lisp-maintainers/file-finder/
 
-=(finder (function "string")) => #F"file_object.type"=
+convenience wrapper
+=(finder (name~ "string")) => #F"file_object.type"=
+granular control
+=(finder* :predicates (name~ "string" ) :root <string | #P> ) => #F"file_object.type"=
 
-Finder functions <ff>
 
+Finder predicates
+path
 - =path~= matches when one of the path elements is contained in the file path.
 - =every-path~= same checks on the file path, but uses a logical and.
 - =path$= matches when one of the path suffixes matches the file path.
+
+file name
 - =name== matches when one of the names matches the file name (case sensitive).
+  - full file name
 - =iname== matches when one of the names matches the file name (case insensitive).
 - =name~= matches when one of the names is contained in the file basename (and not the whole path), case sensitive.
-- =every-name~= same checks on the file basename, but uses a logical and.
+  - partial name
 - =iname~= matches when one of the names is contained in the file, case insensitive.
-- =depth<= matches when the argument file is in a subdirectory of ROOT less deep than LEVEL.
+- =every-name~= same checks on the file basename, but uses a logical and.
+
+extension
 - =extension== matches file extensions
+  -  full exact
+
+recur predicates
+- =depth<= matches when the argument file is in a subdirectory of ROOT less deep than LEVEL.
+- =hidden?= return t if this is a hidden file
 
 #+begin_src lisp
   (ql:quickload :file-finder)
   (use-package :file-finder)
 
-                                          ;set interpretation of finder calls <fc>
+
+
+  ;; basic
+  (file-finder:finder* :root "/home/user/Downloads")
+  (file-finder:finder* :predicates (file-finder:extension= "txt")
+                       :root "/home/user/Downloads")
+  ;; recur predicates
+  (file-finder:finder* :predicates (file-finder:extension= "txt")
+                       :recur-predicates (complement #'file-finder:hidden?)
+                       :root "/home/user/Downloads")
+
+  ;; predicates AND
+  (finder* :predicates (list (name~ "test")
+                             (extension= "txt"))
+           :root "/home/user/Downloads")
+
+  ;; call with find-dir for root
+  (file-finder:finder* :predicates (file-finder:extension= "txt")
+                       :root (first (find-dir :n-test 1
+                                              :keep "Downloads"
+                                              :depth 3)))
+
+
+  ;; wrapper set interpretation is different
   ;; and
   (finder (<ff>)(<ff>))
   ;; or
-  (finder (list (<ff>)(<ff>)))
+  (finder (list (<ff>) (<ff>)))
 
-                                          ; use set math over stringified finder call
-  (set-difference <fc>)
-  (union <fc>)
+  ;; convert results to string to use set operations
+  ;; &&& is there a better way
+  (mapcar #'namestring (finder &&&))
+  (set-difference *), (union *)
 
-                                          ; example that "works on my machine" you will need to test each component
-  (defun layers-from-paths ()
-    "finds files in a dir"
-
-    ;; go to disk region of copied data
-    (cd "/")
-                                          ; match the path
-                                          ; &&&test is 1 item before firsting
-                                          ; get car
-                                          ; make #P<> a string
-                                          ; go there and report
-    (cd (path (first (directory "bulk-1/**/*COPY"))))
-    (format t "Collecting layers from: ~A~%" (pwd))
-                                          ; return string representation of files
-    (set-difference
-     (mapcar #'path (finder (path~ "index") (path~ "indices") (extension= "tif")))
-     (mapcar #'path (finder (path~ "tiles")))
-     :test #'equal))
+  (set-difference
+   (mapcar #'path (finder (path~ "index") (path~ "indices") (extension= "tif")))
+   (mapcar #'path (finder (path~ "tiles")))
+   :test #'equal)
 #+end_src
 
 ** Dir Operations
