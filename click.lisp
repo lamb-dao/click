@@ -21,23 +21,24 @@
 ;;(ql:quickload :clog) ; very slow on swank/gray, breaking repl
 (ql:quickload :verbose)
 (ql:quickload :iterate)
-;;(ql:quickload :cl-schedule) errors
-;;(ql:quickload :mito) errors
+;; &&& new scheduler
+(ql:quickload :clerk)
 (ql:quickload :access)
 ;;(ql:quickload :fset) errors
 (ql:quickload :misc-extensions) ;for gmap helper for fset
 (ql:quickload :listopia)
-;;(ql:quickload :jzon) ;; bad string
+(ql:quickload :com.inuoe.jzon)
 (ql:quickload :cl-csv)
 (ql:quickload :fuzzy-match) ; for find-dir filtering
 
 
 ;; TODO get these working
+
+
+
 (ql:quickload :clog) ; very slow on swank/gray, breaking repl
-(ql:quickload :cl-schedule) errors
 (ql:quickload :mito) errors
 (ql:quickload :fset) errors
-(ql:quickload :jzon) ;; bad string
 
 (ql:quickload :unix-in-lisp) ;&&& load before clesh readtables?
 
@@ -66,8 +67,11 @@
    :echo
    :find-dir
    :*default-pathname-initialized*
-   :*default-pathname-starts*
+   :*default-pathname-project*
    ))
+
+
+;; &&& nicknames (uiop:add-package-local-nickname '#:jzon '#:com.inuoe.jzon)
 
                                         ; enter package
 (in-package :click) ; Also enter this in the REPL!
@@ -78,6 +82,8 @@
   "&&& everything that should happen every startup"
   (quicklisp:update-all-dists)
   &&& setup and export and doc
+  &&& these names are wrong
+
   ;; locations complementary to  *default-pathname-defaults*
   (defvar *default-pathname-start* (uiop:getcwd)
     "Set to the location from which invoked, unchangable")
@@ -478,6 +484,9 @@ eg system-apropos, describe")
 (exit)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;build
 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;scratch
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;reference

@@ -886,13 +886,65 @@ https://iterate.common-lisp.dev
 #+end_src
 
 ** event scheduling
+*** click
 
-cl-schedule
-https://github.com/jcguu95/cl-schedule
-
-Initialization functions custom to click
+&&& Initialization functions custom to click
 - on-start
-- on-target
+- on-project
+
+*** clerk
+
+#+begin_src
+(ql:quickload :clerk)
+(use-package :clerk)
+
+;; Make sure your jobs are loaded before executing (clerk:start)
+(clerk:job "Say 'Hello' often" every 5.seconds (print "Hello"))
+(clerk:start)
+(clerk:stop)
+
+(defun bark ()
+  (print "Bark!"))
+
+(clerk:job "The dog barks" every 7.seconds (bark))
+(clerk:start)
+(clerk:stop)
+
+;; The jobs reside inside clerk:*jobs*,
+(dolist (j clerk:*jobs*)
+  (print j))
+;; list of all scheduled and running jobs.
+(clerk:calendar)
+
+(clerk:empty-jobs-queue)
+(clerk:calendar)
+
+;; all examples above are continuous jobs, set with every
+;; one time jobs are also available
+;; use in  or after to set one time jobs
+(clerk:job "Say 'Hello' often" every 5.seconds (print "Hello"))
+(clerk:start)
+(clerk:job "Bark once" in 15.seconds (bark))
+(clerk:calendar)
+(clerk:stop)
+(clerk:empty-jobs-queue)
+
+;;programmatic setup
+(defparameter *query-interval* 30)
+(clerk:job-function (format nil "Task set for every: ~A seconds" *query-interval*)
+                    'every `(,*query-interval* seconds)
+                    #'bark) ; requires a function symbol or lambda
+#+end_src
+
+Intervals
+
+interval-type is one of the following (plural is equivalent, ie minute = minutes):
+second minute hour day week month year
+=<+ve integer>.<interval>=
+
+or Days of the week
+if you type the day of the week, clerk will calculate when it is and add an event to the queue.
+=(job "Weekly report" every monday (create-report))=
 
 ** database
 
