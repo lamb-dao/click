@@ -57,10 +57,10 @@ install from command line
 sudo apt-get install sbcl
 #+end_src
 
-** lem
+** Spacemacs
 
-https://github.com/lem-project/lem/
 TODO install guide
+TODO basic CL dotfile guide
 
 ** quicklisp
 
@@ -86,67 +86,6 @@ sbcl --eval '(ql-dist:install-dist "http://dist.ultralisp.org/" :prompt nil)' --
 
 &&& dist order
 
-** unix-in-lisp
-
-https://github.com/PuellaeMagicae/unix-in-lisp
-
-&&& install unix-in-lisp before evaluating clesh readtable?
-
-libfixposix prereq
-https://github.com/sionescu/libfixposix
-
-#+begin_src bash
-            mkdir ~/build-lfp
-            git clone https://github.com/sionescu/libfixposix ~/build-lfp
-
-          require:
-          Xautoconf-2.67,
-          Xautomake-1.10,
-          Xlibtool-2.2.6b,
-          Xpkg-config
-          check
-
-            cd ~/build-lfp
-            autoreconf -i -f
-
-            mkdir build
-            cd build
-            ../configure
-            make
-            make install
-
-            #rm -r ~/build-lfp
-#+end_src
-
-
-
-clone the repo
-#+begin_src bash
-git clone https://github.com/PuellaeMagicae/unix-in-lisp ~/quicklisp/local-projects/unix-in-lisp/
-#+end_src
-
-dependencies are on ultralisp
-#+begin_src lisp
-(ql:quickload "unix-in-lisp")
-#+end_src
-
-for better SLIME integration. To load it, evaluate in emacs.
-You may want to add this line to your init.el
-#+begin_src lisp
-(require 'unix-in-slime "~/quicklisp/local-projects/unix-in-lisp/unix-in-slime")
-#+end_src
-
-to start a listener =M-x unix-in-sime=
-
-unix-in-slime installs hacks to the host Lisp environment by calling
-=(unix-in-lisp:install)=
-on startup. To undo hacks done to the host environment
-and unmount Unix FS packages, run
-=(unix-in-lisp:uninstall)=
-
-This may replace all the functions below,
-working on a function that deploys and starts
-
 ** load CLICK
 
 TODO upload to ultralisp.
@@ -155,7 +94,10 @@ This will have to be loaded manually for now.
   git clone https://github.com/lamb-duh/click ~/quicklisp/local-projects/click
 #+end_src
 
-evaluate &&& how to open the editor &&& how to eval
+&&& how to open the editor
+&&& how to eval
+
+evaluate
 #+begin_src lisp
     (ql:quickload :click)
     (usepackage :click)
@@ -163,74 +105,53 @@ evaluate &&& how to open the editor &&& how to eval
 
 * Shell Operations
 
-Many people want to check out Lisp, and could justify it if they were just
-poking around, nothing serious though. I aim to make that easy. 90% of projects
-begin in shell, just poking around, I certainly have no ulterior motives.
+99% of my projects begin in shell, just poking around, I certainly have no
+grand plans beyond inquiry, then some abomination of bash or poor perf python grows around
+that beginning. I aim to make bootstrapping that exploratory phase easy in CL. My goal is to make evolution
+from early inquiry to a fully fledged high perf program easy.
 
-Standard shell commands should feel native. Anybody with programming/bash
-experience should be immediately at home on the CL REPL. Initially These can be simple wrappers, the goal
-is to eventually have them all in portable common lisp, and have each doc-string
-describe the canonical CL approach.
+Basic shell commands should feel native. Anybody with programming/bash
+experience should be immediately at home on the CL REPL. Initially These can be
+simple wrappers, the goal is to eventually have them all in portable common
+lisp, and have each doc-string describe the canonical CL approach. Ideally I
+would love to wrangle the best parts of nushell to this kit as well.
 
-Commands are moved through the sections as they are worked on.
+** Implemented
 
-** Planned
-
-1. tar
-2. gzip
-3. ps
-4. htop
-5. kill
-6. df
-7. du
-8. ifconfig
-9. wget
-10. curl
-11. cut
-12. sed
-
-** First Implemented
-The command is implemented to provide simple function. Use at your own risk and test as you go.
-It may be a wrapper, its limitations should be noted in docstring
-
-1. sort
-2. wc
-3. uniq
-4. time
-5. head
-6. tail
-7. rm
-8. uname
-9. date
-10. find
-11. whoami
-12. cp
-13. mv
-14. cat
-15. grep (file grep, needs to map ppcre string matching for composability)
-16. which
-17. echo
-18. mkdir
-19. rmdir
-20. touch
-21. chmod
-22. chown
-23. ls
-
-** Tested
-The command works as it should, if any functionality is missing it is noted in docstring.
+- builtins that wont be overridden
+  - sort
+  - time
+  - find
 
 1. pwd
-2. cd
+2. ls
+3. cd
+4. which
+5. cat
+6. head
+7. tail
 
-** Docstring is educative
-The docstring educates the user on cannonical CL approaches.
-The convenience commands should move the user toward the language.
-May still be wrapper though
-** Portable Cannonical
-The command is not a wrapper, its function is implemented in CL
+** Not implemented
+Listed in priority order from partially completed to planned. In code move status headings down as completion progresses.
+
+1. rm
+2. mv
+3. cp
+4. touch
+5. rmdir
+6. mkdir
+7. echo
+8. chown
+9. chmod
+10. grep (file grep, needs to map ppcre string matching for composability)
+11. wc
+12. uniq
+13. whoami
+14. date
+15. uname
+
 * System Concepts
-
+** Intro
 In the core of lisp the meta circular evaluator was discovered by John Mcarthy;
 from system primitives lisp develops a self evaluator for the language, and then builds out to
 create the language. The implication of this is that lisp is built ON lisp, and
@@ -264,48 +185,176 @@ Many granular steps are available and required to precisely specify the system,
 none of this is particularly verbose, but it does require a change of details to
 attend to. If something is not working as expected, I check what actions I have
 assumed are accomplished by some explicit command.
+** click custom
 
-** Importing
+- *default-pathname-initialized*
+  - root pathname for point of initization
+  - immutable
+- *default-pathname-project*
+  - root pathname for project
+  - mutable
 
-&&& packages are sets of symbols
+- find-dir
+  - fuzzy find directory
+  - details below
 
-&&& entering and using packages (load &&&) is not (use-package :eat-me) is not (in-package :drink-me)
+- on-start
+  - automatically invoked
+  - sets pathname for *default-pathname-initialized*
+  - sets pathname for *default-pathname-project*
+  - updates all distributions
+  - will have clerk jobs
+
+- on-project
+  - user invokes
+  - sets pathname for *default-pathname-project*
+  - will have clerk jobs
+
+- p
+  - minimal keystoke maximal utility print parser
+  - not implementd
+
+- help
+  - interactive help menu
+  - not implemented
+
+** Packages and imports
+
+  lisp packages
+  a container to group symbols together
+    a symbol is a basic type denoting a funciton or a variable or other things
+
+  a package is a first class object
+  used as namespaces
+  possible to create multiple packages per system/project
+
+  initially the repl places the user in the cl-user package
+  CL-USER> *package*
+  cl-user contains basic functions variables and macros, defun etc
 
 #+begin_src lisp
-                                           ; import and load
-   (ql:quickload :cmd)
-   (ql:quickload :file-finder)
-   (ql:quickload :str)
+  (in-package :cl-user) ; make cl-user package available now
+  (defpackage :my-package
+    (:use :cl) ; :cl bring cl-user symbols into my-package
+    (:export :*exported-symbol*))
+  (in-package :my-package)
 
-                                           ; &&& load local file
+  ;; (export '*exported-symbol*) ;export in place or use :export in definition
+  (defparameter *exported-symbol* 'hello)
 
-                                           ; package def
-   (defpackage :click
-                                           ; whole package import
-     ;; use cl to bring in basic functions
-     (:use :cl :str :cmd :file-finder)
-                                           ; shadowing
-     ;; in this eg file-finder and cmd conflicted for current directory, with an error
-     ;; cmd is now selected and the error no longer appears
-     (:shadowing-import-from :cmd :current-directory)
-                                           ; specific function import to this namespace
-     (:import-from :uiop
-      :subdirectories :directory-files :getcwd)
-                                           ; functions to export from the package
-     (:export
-      :pwd
-      :ls
-      :cd
-      :cat
-      :grep
-      :which
-      :echo
-      :*default-pathname-initialized*
-      :*default-pathname-starts*
-      ))
 
-                                           ; enter package
-   (in-package :click) ; Also enter this in the REPL!
+  ;; check available symbols in a package
+  (do-external-symbols (sym :cl)
+    (print sym)) ; show current symbols ~1000
+
+  (do-external-symbols (sym :my-package)
+    (print sym)) ; our one symbol
+#+end_src
+
+Package symbols interaction details
+#+begin_src lisp
+
+                                          ; imports
+  (ql:quickload :cmd)
+  (ql:quickload :str)
+  (ql:quickload :file-finder)
+  (ql:quickload :com.inuoe.jzon)
+                                          ; package declaration
+  (defpackage :my-package
+                                          ; whole package import
+    (:use :cl :str :cmd :file-finder)
+                                          ; shadowing, declares dominant function
+    (:shadowing-import-from :cmd :current-directory)
+                                          ; specific function import to this namespace
+    (:import-from :uiop
+     :subdirectories :directory-files :getcwd)
+                                          ; rename package and or function
+    (:local-nicknames (:jzon :com.inuoe.jzon))
+                                          ; export functions and params to the click: name space
+    (:export
+     :my-function
+     :*my-parameter*
+     ))
+                                          ; enter package
+  (in-package :my-package) ; Also enter this in the REPL
+  ;; to leave (in-package :cl-user), :my-package maintains state
+
+                                          ; load local file
+  (load (merge-pathnames #P"path/to/my-file.lisp" (uiop:getcwd)))
+  #+end_src
+
+** Loading Systems
+
+Lisp systems
+  system definition is declarative
+  contains meta data of the project similar to debian packages
+  possible to create multiple systems per asd file
+
+it is default for the asd file to match the dir
+- my-project (dir)
+  - my-project.asd
+
+#+begin_src lisp
+  ;;an example my-project.asd file
+  (defsystem :my-project
+    :depends-on (:alexandria :str)
+    ;; components in flat file system
+    ;; - my-project.asd
+    ;; - my-project.lisp
+    ;; - README.org
+    :serial t
+    :components ((:file "my-project") ; a .lisp file
+                 (:static-file "README.org"))
+    ;; components in hierarchical file system
+    ;; my-project.asd
+    ;; - src
+    ;;   - utils.lisp
+    ;;   - my-project.lisp
+    ;;   - config.lisp
+    ;; - test
+    ;;   - tests.lisp
+    :serial t
+    :components ((:module "src"
+                  :components ((:file "utils")
+                               (:file "my-project")
+                               (:file "config")))
+                 (:module "test"
+                  :components tests)))
+  ;; defsystem is capable of complex loading order dependencies
+
+  ;; an example my-project.lisp file
+  (in-package :cl-user)
+  (defpackage #:my-package
+    (:use :cl)
+    (:export :my-function))
+  (in-package :my-package)
+  (defun my-function ()
+    "an exported function"
+    (print "hello world"))
+#+end_src
+
+Interactive loading
+  clone a project to local, eg str
+  cli nav to find system definintion, eg str.asd
+  start a lisp
+  $ sbcl
+  CL-USER>
+#+begin_src lisp
+  ;;load system definition
+  (asdf:load-asd "str.asd") ; use exact path
+
+  ;; load system
+  (asdf:load-system "&&&") ; will not load dependencies
+  (asdf:system-depends-on (asdf:find-system "str")) ; list of dependencies
+
+  (ql:quickload :str) ; recursively loads dependencies
+  (in-package :str) ; enter the package to use internal functions
+
+  ;; in emacs open str.asd file
+  C-c C-k to compile and load
+
+  (ql:quickload :str)
+  (in-package ::str) or C-c ~
 #+end_src
 
 ** REPL and error and messages
@@ -379,25 +428,25 @@ Override default-pathname-defaults
 
 ** find-dir
 
-  find-dir takes a list of paths and fuzzy filters directories, if depth is set it descends into directory tree,can be sequentially applied to its own output.
+find-dir takes a list of paths and fuzzy filters directories, if depth is set it descends into directory tree,can be sequentially applied to its own output.
 
-  arg : default action : description
-  root : '(#P\"/\") : a list with paths or a path in #P or string form
-  depth : 0 : an integer for retrieval depth below roots, default 0 goes no deeper for filtering root list
-  keep : all : space delimited words to separately(additive to set) fuzzy filter in
-  drop : none : space delimited words to separately(additive to set) fuzzy filter out, applied after keep
-  report : none : set true for reporting on processing, big ass reports if depth is large
-  n-test : off : integer for required num of paths in output list, error and report if not "
+arg : default action : description
+root : '(#P\"/\") : a list with paths or a path in #P or string form
+depth : 0 : an integer for retrieval depth below roots, default 0 goes no deeper for filtering root list
+keep : all : space delimited words to separately(additive to set) fuzzy filter in
+drop : none : space delimited words to separately(additive to set) fuzzy filter out, applied after keep
+report : none : set true for reporting on processing, big ass reports if depth is large
+n-test : off : integer for required num of paths in output list, error and report if not "
 
 #+begin_src lisp
 
-            (find-dir :keep "lib opt" :drop "etc lib gnu" :depth 2)
-            (find-dir :report t :keep "lib opt" :drop "etc lib gnu" :depth 2)
-            (find-dir :n-test 6 :depth 3 :keep "opt" :drop "gnu"  )
-            (find-dir :drop "chrome"
-                      :root (find-dir :depth 2
-                                      :keep "opt"
-                                      :drop "gnu"))
+  (find-dir :keep "lib opt" :drop "etc lib gnu" :depth 2)
+  (find-dir :report t :keep "lib opt" :drop "etc lib gnu" :depth 2)
+  (find-dir :n-test 6 :depth 3 :keep "opt" :drop "gnu"  )
+  (find-dir :drop "chrome"
+            :root (find-dir :depth 2
+                            :keep "opt"
+                            :drop "gnu"))
 
 
 #+end_src
@@ -544,9 +593,268 @@ Online commentary defining paths from root is guaranteed consistent. I just set 
 
   (with-open-file (stream filename)
     (iter (for line = (read-line stream nil))
-          (while line)
-          (format t "~A%~%" line)))
+      (while line)
+      (format t "~A%~%" line)))
 #+end_src
+
+** command line REPL
+
+$ rlwrapper sbcl #allows readline support on terminal
+
+CL-USER> (print "hello")
+"hello" ; standard out
+"hello" ; evaluation
+
+=*= references last returned evaluation
+
+** Interfacing emacs/code/REPL
+pushing parens ahead around next form
+go to source
+l to move back in stack trace
+slime-cd to change location
+** Most common functions
+
+1. defun - Define functions
+2. let - Create local bindings
+3. loop - Powerful iteration construct
+4. if - Conditional execution
+5. setf - Generalized assignment
+6. mapcar - Apply function to each element of a list
+7. format - Formatted output
+8. cond - Multi-way conditional
+9. defparameter - Define global variables
+10. lambda - Create anonymous functions
+11. when - Single-clause conditional
+12. unless - Negated single-clause conditional
+13. progn - Execute a series of forms sequentially
+14. dolist - Iterate over list elements
+15. cons - Construct lists
+16. car/first - Access first element of a list
+17. cdr/rest - Access rest of a list
+18. print - Print Lisp objects to a stream
+19. append - Combine lists
+20. length - Get length of a sequence
+21. list - return a list made of the arguments
+22. nth - Access nth element of a list
+23. push - Add an item to the front of a list
+24. pop - Remove and return the first item of a list
+25. aref - Access array elements
+26. read - Read Lisp objects from a stream
+27. find - Search for an item in a sequence
+28. member - Check if an item is in a list
+29. remove - Remove items from a sequence
+30. funcall - Call function by variable
+31. apply - Apply function to argument list
+32. reduce - Reduce a list to a single value
+33. sort - Sort a sequence
+34. defmacro - Define macros
+35. with-open-file - File I/O with automatic cleanup
+36. equalp - General equality predicate
+37. make-array - Create arrays
+38. subseq - Extract a subsequence
+39. typecase - Type-based conditional
+40. make-hash-table - Create hash tables
+41. gethash - Access hash table entries
+42. defclass - Define classes (for CLOS)
+43. make-instance - Create object instances
+44. slot-value - Access object slots
+45. values - Return multiple values
+46. multiple-value-bind - Bind multiple values
+47. defstruct - Define structures
+48. declare - Declare variables or provide optimization hints
+49. handler-case - Error handling
+50. load - Load and execute Lisp code from a file
+51. eval - Evaluate Lisp expressions at runtime
+52. defmethod - Define methods for generic functions
+53. destructuring-bind - Destructure complex data structures
+54. macroexpand-1 - Expand a macro once
+55. time - Measure execution time
+56. intern - Create or locate a symbol
+57. symbol-function - Access a symbol's function definition
+58. gensym - Generate unique symbols
+59. coerce - Convert between types
+60. make-string - Create a string
+61. string-trim - Remove characters from string ends
+62. concatenate - Join sequences
+63. position - Find position of an item in a sequence
+64. reverse - Reverse a sequence
+65. nreverse - Destructively reverse a sequence
+66. assoc - Look up key-value pairs in an association list
+67. every - Test if predicate is true for all elements
+68. some - Test if predicate is true for any element
+69. dotimes - Iterate a specified number of times
+70. do - General iteration construct
+71. acons - Add to an association list
+72. copy-tree - Deep copy of a tree structure
+73. remove-if - Remove elements satisfying a predicate
+74. map - Apply function to elements of multiple sequences
+75. char - Access character in a string
+76. eq - Test for object identity
+77. defgeneric - Define a generic function
+78. make-list - Create a list of specified length
+79. substitute - Replace items in a sequence
+80. parse-integer - Parse string to integer
+81. compile - Compile a function
+82. documentation - Get or set documentation string
+83. trace - Trace function calls
+84. untrace - Untrace function calls
+85. break - Enter debugger
+86. describe - Display information about an object
+87. type-of - Get type of an object
+88. typep - Test if object is of a given type
+89. restart-case - Define restarts for error handling
+90. defpackage - Define a package
+91. in-package - Switch to a package
+92. merge - Merge sorted sequences
+93. logior - Bitwise logical OR
+94. logand - Bitwise logical AND
+95. ash - Arithmetic shift
+96. floor - Integer division with floor rounding
+97. ceiling - Integer division with ceiling rounding
+98. round - Round to nearest integer
+99. random - Generate random number
+100. constantly - Create constant function
+101. identity - Identity function
+102. flet - Define local functions
+103. labels - Define locally recursive functions
+104. evenp - Test if a number is even
+105. oddp - Test if a number is odd
+106. zerop - Test if a number is zero
+107. plusp - Test if a number is positive
+108. minusp - Test if a number is negative
+109. max - Find maximum value
+110. min - Find minimum value
+111. remf - Remove a property from a property list
+112. getf - Get a property value from a property list
+113. pprint - Pretty print
+114. apropos - Search for symbols
+115. read-from-string - Read Lisp object from a string
+116. write-to-string - Write Lisp object to a string
+117. ignore-errors - Ignore errors in a form
+118. nconc - Destructively concatenate lists
+119. make-package - Create a new package
+120. find-package - Find a package by name
+121. export - Export symbols from a package
+122. import - Import symbols into a package
+123. shadow - Shadow inherited symbols
+124. shadowing-import - Import symbols, shadowing existing ones
+125. ensure-directories-exist - Create directories if they don't exist
+126. probe-file - Check if a file exists
+127. delete-file - Delete a file
+128. rename-file - Rename a file
+129. file-length - Get file size
+130. file-position - Get or set file position
+131. open - Open a file or stream
+132. close - Close a stream
+133. read-line - Read a line from a stream
+134. write-line - Write a line to a stream
+135. read-char - Read a character from a stream
+136. write-char - Write a character to a stream
+137. peek-char - Look at next character in stream without consuming it
+138. listen - Check if input is available on a stream
+139. clear-input - Clear input buffer
+140. y-or-n-p - Ask a yes-or-no question
+141. sleep - Pause execution for a specified time
+142. get-universal-time - Get universal time
+143. decode-universal-time - Convert universal time to decoded time
+144. encode-universal-time - Convert decoded time to universal time
+145. get-decoded-time - Get current time as decoded time
+146. load-compiled - Load a compiled Lisp file
+147. complement - Create complementary predicate function
+148. count - Count occurrences in a sequence
+149. count-if - Count elements satisfying a predicate
+150. position-if - Find position of element satisfying predicate
+151. remove-duplicates - Remove duplicate elements from a sequence
+152. intersection - Set intersection of sequences
+153. union - Set union of sequences
+154. set-difference - Set difference of sequences
+155. subsetp - Test if one set is a subset of another
+156. force-output - Force output on a stream
+157. finish-output - Finish pending output on a stream
+158. fresh-line - Move to a fresh line on output
+159. terpri - Terminate print line
+160. princ - Print object readably
+161. prin1 - Print object not readably
+162. pprint-newline - Insert a newline in pretty printing
+163. copy-seq - Create a copy of a sequence
+164. mod - Modulus operation
+165. fill - Fill a sequence with a value
+166. replace - Replace part of a sequence with another
+167. search - Search for a subsequence
+168. mismatch - Find first mismatch between sequences
+169. stable-sort - Stable sorting algorithm
+170. merge-pathnames - Merge pathname with defaults
+171. pathname - Create a pathname object
+172. directory - List files in a directory
+173. file-namestring - Get filename part of a pathname
+174. file-author - Get file author
+175. file-write-date - Get file modification time
+176. user-homedir-pathname - Get user's home directory pathname
+177. get-properties - Get multiple properties from property list
+178. remprop - Remove a property from a symbol
+179. symbol-plist - Get a symbol's property list
+180. copy-symbol - Create a copy of a symbol
+181. keywordp - Test if a symbol is a keyword
+182. macro-function - Get macro function of a symbol
+183. elt - Access sequence elements (more general than aref)
+184. vector - Create a vector
+185. string= - Compare strings for equality
+186. string-equal - Compare strings ignoring case
+187. string< - Compare strings lexicographically
+188. parse-float - Parse string to float (often implemented as an extension)
+189. defvar - Define global variables with optional initial value
+190. make-string-input-stream - Create a string input stream
+191. make-string-output-stream - Create a string output stream
+192. get-output-stream-string - Get string from a string output stream
+193. hash-table-count - Get number of entries in a hash table
+194. clrhash - Clear a hash table
+195. remhash - Remove an entry from a hash table
+196. maphash - Iterate over hash table entries
+197. get-internal-real-time - Get current time
+198. room - Display memory usage information
+199. functionp - Test if an object is a function
+200. symbolp - Test if an object is a symbol
+201. stringp - Test if an object is a string
+202. numberp - Test if an object is a number
+203. characterp - Test if an object is a character
+204. arrayp - Test if an object is an array
+205. listp - Test if an object is a list
+206. atom - Test if an object is an atom (not a cons)
+207. null - Test if an object is nil
+208. equal - Test for structural equality
+209. eql - Test for object identity or numeric equality
+210. string-downcase - Convert string to lowercase
+211. string-upcase - Convert string to uppercase
+212. float - Convert a number to floating-point
+213. abs - Absolute value
+214. sqrt - Square root
+215. expt - Exponentiation
+216. incf - Increment a place
+217. decf - Decrement a place
+218. nthcdr - Get the nth cdr of a list
+219. butlast - Return a list with the last n elements removed
+220. last - Get the last cons cell of a list
+221. compile-file - Compile a Lisp source file
+222. disassemble - Display machine code for a compiled function
+223. machine-type - Get machine type
+224. software-type - Get operating system type
+225. with-slots - Access slots of CLOS objects conveniently
+226. make-sequence - Create a sequence of a given type and length
+227. find-if - Find an element satisfying a predicate
+228. remove-if-not - Keep elements satisfying a predicate
+229. substitute-if - Substitute elements satisfying a predicate
+230. defconstant - Define global constants
+231. &rest - Special parameters for function definitions
+232. &optional - Special parameters for function definitions
+233. assert - Assertion macro for debugging and error checking
+234. block - Named blocks and non-local returns
+235. return-from - Named blocks and non-local returns
+236. case - Switch-like conditional construct
+237. error - Signal an error
+238. warning - Signal a warning
+239. with-open-stream - Similar to with-open-file, but for streams in general
+240. mapcan - Like mapcar, but concatenates results
+241. multiple-value-call - Call a function with multiple value returns
 
 * Syntax Concepts
 Functions within functions within functions. Look inward.
@@ -603,18 +911,96 @@ could a program treat a program like data and change it?
 
 A: It is just a tree, code is data, data is code.
 
-** defparameter vs defvar
-Clarify which is immutable
+** Variables
+defparameter vs defvar, both set global variables
+defparameter is mutable
+defvar is immutable
+
+let is lexically scoped, valid within it range
+let can dynamically redefine a global variable temporarilly
+
+#+begin_src  lisp
+(defparameter *my-param*) ;error requires binding
+(defparameter *my-param* nil) ; bound to NIL
+(defparameter *my-param* '()) ; bound to NIL
+(defparameter *my-param* 42
+  "doc for my-param")
+(defparameter *my-param* 47
+  "doc for my-param") ; rebound
+
+
+(defvar *my-var*) ; success unbound at this point, not even nil
+(defvar *my-var* 124) ; bound at this point
+(defvar *my-var* 1) ; immutable, but no error on attempt
+
+(let (a b)
+  (setf a 1
+        b 2)
+  (format t " a: ~A b: ~A~&" a b))
+(let ((a 3)
+      (b 4 ))
+  (format t " a: ~A b: ~A~&" a b))
+
+(let* ((a 3)
+       (b 4)
+       (c (+ a b)))
+  (format t " a: ~A b: ~A c: ~A~&" a b c))
+
+(format t "outside the lexical scope before the let *my-param*: ~A~&" *my-param*)
+(let ((*my-param* 11))
+  (format t "only within the lexical scope of the let *my-param*: ~A~&" *my-param*))
+(format t "outside the lexical scope after the let *my-param*: ~A~&" *my-param*)
+#+end_src
+
+** Conditions
+
+#+begin_src  lisp
+  (if (test)
+      (then) ; or prog1 for then,continuing
+      (else))
+
+  (when (test)
+    (then)
+    (continuing)) ; implicit progn, no else
+  ;; (unless) compliment of when
+
+  (not (test)) ; compliment of test
+
+
+  (cond ; returns first true block
+    (test
+        logic0
+      logic1
+      )
+    (t :default))
+
+  (case a
+    (1
+     :its1)
+    (t :default))
+
+  ;; conditional on environment
+  *features* is a list of keywords anyone can add to it
+  (push :my-feature *features*)
+  #+unix
+  (print "we are on unix")
+
+  #-foo
+  (print "of course there is no foo feature")
+
+  #+(and unix my-feature)
+  (print "we are on unix working on my-feature")
+#+end_src
 ** args
 
 #+begin_src lisp
   ;; arguments
-  ;ordered binding
+                                          ;ordered binding
   (defun example-function (required &optional (optional-arg nil optional-arg-supplied-p))
     (if optional-arg-supplied-p
         (format t "Optional argument was supplied: ~A~%" optional-arg)
         (format t "Optional argument was not supplied~%")))
-  ; :keyword binding
+                                          ; :keyword binding
   (defun example-function (&key (keyword-arg nil keyword-arg-supplied-p))
     (if keyword-arg-supplied-p
         (format t "Keyword argument was supplied: ~ A~%" keyword-arg)
@@ -627,41 +1013,339 @@ Clarify which is immutable
 ** functions
 
 #+begin_src lisp
-;; local functions
-(defun example-flet ()
-  (flet ((local-func (x) (* x 2)))
-    (local-func 5)))
+  ;; declaration
+  (defun hello ()
+    "docstring for hello"
+    (format t "hello ~A" (uiop:getenv "USER")))
+  (hello)
 
-(defun example-labels ()
-  (labels ((a () (print "In A")))
-    (a)))
+  ;; local functions
+  (defun example-flet ()
+    (flet ((local-func (x) (* x 2)))
+      (local-func 5)))
 
-(defun example-labels-mutual ()
-  (labels ((a () (print "In A"))
-           (b () (a)))
-    (b)))
+  (defun example-labels ()
+    (labels ((a () (print "In A")))
+      (a)))
+
+  (defun example-labels-mutual ()
+    (labels ((a () (print "In A"))
+             (b () (a)))
+      (b)))
+
+
+
+
+(defun hello (name &optional happy) ; optional nil by default
+  (format t "hello ~A~&" name)
+  (if happy ; when truthy
+    (format t ":)")
+    (format t ":(")))
+
+(defun hello (name &key (happy "default value" happy-p))
+  "doc string"
+  (format t "hello ~A~&" name)
+  (when happy-p ; when supplied
+    (if happy
+        (format t ":)")
+        (format t ":(")) ))
+
+(defun mean (x &rest numbers)
+  "compute mean to demonstrate variadic num of args"
+  (format t "&rest yields a list. numbers: ~A~&" numbers)
+  (/ (apply #'+ x numbers)
+     (1+ (length numbers))))
+
+,-h-h slime-describe-symbol
+(apropos "hello") ; loaded in image
+(documentation 'hello 'function) ; a symbol
+(documentation #'hello 'function) ; a function
+;; it is meaningfully different to inspect the symbol vs the function
+(inspect 'hello) ; show symbol attributes
+(inspect #'hello) ; show function bindings
+;; additionally ' mostly refers to toplevel bindings while #' respects lexical environment, flet etc
+;; a source of subtle bugs
+(describe #'hello) ; usually this is what you need
+
+flet is like let, must be independent
+labels is like let*, can refer to each other
+
+;;multiple return values
+(defun my-multiple-returns ()
+  (let ((a 1)
+        (b 2)
+        (str "my-string"))
+    (values a b str)))
+
+  ;; not a list or tuple
+(my-multiple-returns) ; => 1, 2, "my-string"
+;; the return value is the first of values
+CL-USER> * ; => 1
+(nth-value 2 (my-multiple-returns))
+(multiple-value-bind (0th 1th) ;  bind to local variables in order,  can bind part or all
+    (my-multiple-returns)
+  (print 0th)
+  (print 1th))
+
+;; higher order functions
+(defun compute (x y &key (operation #'+))
+   (funcall operation x y))
+(compute 1 2)
+(compute 1 2 :operation #'-)
+
+(member "foo" '("foo" "bar"))
+(member "foo" '("foo" "bar") :test #'string-equal)
+
+(lambda (x) (1+ x))
+CL-USER> (funcall * 2)
+
+(compute 4 2 :operation (lambda (x y) (+ 10 x y)))
+
+(defun generate-adder (step)
+  (lambda (x)
+    (+ x step)))
+
+(generate-adder 10)
+
+funcall and apply
+
+;; closures
+function closes over the environment
+
+(let ((counter 0))
+  (defun counter-inc ()
+    (incf counter))
+  (defun counter-init ()
+      (setf counter 0))
+  (defun counter-value ()
+    counter))
+
+(counter-inc)
+(counter-value)
+(counter-init)
+
+;; returning closures
+(defun make-looping-counter (limit)
+  (let ((counter 0))
+    (lambda ()
+      (if (>= counter limit)
+          (setf counter 0)
+          (incf counter)))))
+(defparameter *counter-to-2* (make-looping-counter 2))
+(funcall *counter-to-2*)
+(inspect *counter-to-2*)
+
+;; setf functions
+(let ((counter 0))
+  (defun counter-inc ()
+    (incf counter))
+  (defun counter-init ()
+      (setf counter 0))
+  (defun counter-value ()
+    counter)
+  (defun (setf counter-value) (new-value) ; reuse accessor, supply value and any accessor arg
+    (setf counter new-value)))
+
+(counter-init)
+(counter-inc)
+(setf (counter-value) 6) ; setf the location provided by the accessor
+(counter-value)
+
+
 #+end_src
 
 ** returns
 
 #+begin_src lisp
-;; let return
-(let ((a 3)) a) ; => 3
+  ;; let return
+  (let ((a 3)) a) ; => 3
 #+end_src
 
-** errors
-
+** Errors and Handling
 #+begin_src lisp
-;;simple errors
-(error "This is an error message")
-(error "Problem with x=~D and y=~S" x y)
-;;specific error types:
-(signal 'type-error (list :expected-type 'number :datum "not a number"))
-;;For custom errors, define a condition and use `error` with it:
-(define-condition my-custom-error (error) ())
-(error 'my-custom-error)
+
+  ;;simple errors
+  (error "This is an error message")
+  (error "Problem with x=~D and y=~S" x y)
+  ;;specific error types:
+  (signal 'type-error (list :expected-type 'number :datum "not a number"))
+  ;;For custom errors, define a condition and use `error` with it:
+  (define-condition my-custom-error (error) ())
+  (error 'my-custom-error)
+
+  ;; create an error
+  (error "Signals an error. The arg was: ~A" arg)
+  (warn "carefull") ; no debugger
+  ;; create object
+  (make-condition 'simple-condition ) ; type one of: 'warn 'error 'simple-condition
+  ;; signal it
+  (signal *)
+  signal then handle not throw catch
+
+  (ql:quickload :log4cl)
+  (defun f1 (&optional (arg 'nil))
+    (error "Signals an error. The arg was: ~A" arg))
+  (defun f2 ()
+    "handle conditions with handle case"
+    (handler-case
+        (f1)
+      (error (c) ; c for the condition we want to handle
+        (log:info "We got an error: ~A" c))))
+
+  (defun w1 ()
+    (warn "Warning"))
+  (defun f2 ()
+    "handle conditions with handle case"
+    (handler-case
+        (w1)
+      ;;doesnt catch warnings
+      (error (c) ; c for the condition we want to handle
+        (log:info "We got an error: ~A" c))
+      (warning (c)
+        (log:info "we got a warning: ~A" c))))
+
+  ;; catch errors
+  ;; handler-case
+  ;; define errors
+  ;; ignore-errors
+  ;; unwind-protect
+  ;; handler-bind
 #+end_src
 
+** Macros
+#+begin_src lisp
+
+
+macros do not evaluate their arguments, it is passed as is to the macro process
+macros expand to function calls at compile time
+
+
+(defmacro cube (x)
+  `(* ,x ,x ,x))
+(cube 2)
+
+;;quote
+;; quote does not evaluate its argument.
+
+(list 1 a 2 b) ; > error on a unbound
+(quote (list 1 a 2 b)) ; > (LIST A etc) list of symbols
+'(list 1 a 2 b) ; > same
+
+(list :a 1 :b 2) ; > (:A etc)
+'(:a 1 :b 2) ; > same
+
+(quote (list :a 1 :b 2)) ; > (LIST :A etc)
+(eval (quote (list :a 1 :b 2))) ; > (:A etc) full circle
+
+(let ((a 1)
+      (b 2))
+  (list 'a a 'b b)) ; > (A 1 B 2)
+
+
+;;backquote and comma
+;; do not require macros to use bq and comma
+(let ((a 1)
+      (b 2))
+  `(:a ,a :b ,b)) ; > (:A 1 :B 2)
+
+;; how to spot you are using a macro
+non reqular lisp syntax eg loop macro
+non regular paren nesting eg let
+starts with 'with' eg with open file
+new variable bindings eg dolist
+
+;;macros vs functions
+
+macros can not  be used as HOF
+funcall, mapcar, apply etc
+(defmacro cube (x)
+  "you dont need a macro for this"
+  `(* ,x ,x ,x))
+(mapcar #'cube (list 1 2 3 4)) ; > error macro not function
+
+redefining a macro requires recompiling all functions that use it to be updated
+a macro is not called at runtime, because it expands to code at compile time
+(defmacro madd (x)
+  `(+ 1 ,x))
+(defun adder (x)
+  (madd x))
+(adder 1) ; > 2, even if we recompile madd, must recompile adder to update
+
+slime-macroexpand-all will reveal that the macro has been included in the function at compilation
+slime-who-calls functions
+slime-who-references symbols
+slime-who-macroexpands macros
+  jumps to a file, which we may C-c C-k  slime-compile-and-load to recompile all
+  but you probably dont need a macro. use them lightly
+
+;; comma-splice
+does not require a macro to use
+
+(list :params (loop for i to 2 collect i)) ; => (:PARAMS (0 1 2))
+`(:params ,@(loop for i to 2 collect i)) ; => (:PARAMS 0 1 2)
+
+(defmacro mrest (@rest rest)
+  (format t "rest is: ~S" rest)
+  ~(progn
+     ,@rest))
+
+;;body
+
+(defmacro with-body (&body body)
+  `(progn ,@body))
+(with-body
+  (print :body))
+
+(defmacro my-dolist ((var expr) &body body)
+  `(loop for ,var in ,expr do
+         (progn
+           ,@body)))
+(my-dolist (x '(1 2 3))
+  (print x))
+
+;;
+(defmacro with-echo (&body body)
+  `(format nil "the result of ~S is ~S"
+           (quote ,@body)
+           (progn ,@body)))
+(with-echo (+ 1 1))
+
+;; gensym
+subtle bugs due to variable capture without this
+
+;; call-with pattern
+makes reasoning and testing macros easier
+
+(defun call-with-repeat (times function)
+  (loop for x from 1 to times do
+        (funcall function)))
+(defmacro repeat (times &body body)
+  `(call-with-repeat ,times (lambda () ,@body)))
+(let ((x "hi"))
+  (repeat 3 (print x)))
+
+;; compile time computing
+use to reduce execution calculations and for developer errors at compile time
+defun*
+
+;; lists vs AST
+CL macros manipulates lists of symbols
+
+;; symbol-macro
+
+;; read time evaluation with #.
+
+;; macro-step
+#+end_src
+
+** CLOS
+;; pretty printing
+;; defclass
+;; custom constructors
+;; initialize-instance
+;; multiple inheritance
+;; defgeneric vs defmethod
+;; class allocation
 ** quoting data
 ** logic
 ** control
@@ -851,38 +1535,107 @@ https://shinmera.github.io/verbose/
 https://iterate.common-lisp.dev
 
 #+begin_src lisp
-  (ql:quickload "iterate")
+  (ql:quickload :iterate)
   (use-package :iterate)
 
-                                          ; Simple iteration over a range:
+  (iterate:display-iterate-clauses)
+
+  (defparameter *my-vector* #(1.1 2.2 3.3 4.4))
+  (defparameter *my-list* '(1 2 3 4))
+
+  (defparameter *my-hashtable* (make-hash-table))
+  (setf (gethash 'a *my-hashtable*) 10)
+  (setf (gethash 'b *my-hashtable*) 20)
+  (setf (gethash 'c *my-hashtable*) 30)
+
+  ;; hashtables
+  (iter (for (k v) in-hashtable *my-hashtable*)
+    (collect (cons k v)))
+
+  ;; List iteration
+  (iter (for i in *my-list*)
+    (collect i))
+
+  ;; Vector iteration
+  (iter (for v in-vector *my-vector*)
+    (collect v))
+
+  ;; ranges
   (iter (for i from 1 to 10)
-        (sum i))
+    (collect i))
+  (for i upfrom 0)
+  (for i from 5)
+  (for i downfrom 0)
+  (for i from  1 to 10)
+  (for i from 1 below 10)
+  (for i from 1 to 10 by 2)
+  (for i from 10 downto 1)
 
-                                          ; Simple iteration over a list:
-  (iter (for x in '(1 2 3 4 5))
-        (sum x))
+  ;; Nested iterations:
+  (iter outer (for i from 1 to 3)
+    (iter (for j from 1 to 3)
+      (in outer (collect (list i j)))))
 
-                                          ; Iterating over a range of numbers:
+  ;; Conditional collection:
+  (iter (for i from 1 to 10)
+    (when (evenp i)
+      (collect i)))
+
+  ;; Summing:
+  (iter (for i in '(1 2 3 4 5))
+    (sum i))
+
+  ;; Finding maximum:
+  (iter (for i in '(3 7 2 9 1))
+    (maximize i))
+
+  ;; String iteration:
+  (iter (for char in-string "Hello")
+    (collect (char-upcase char)))
+
+  ;; Iterating with multiple variables:
   (iter (for i from 1 to 5)
-        (collect (* i i)))
+    (for j from 10 downto 6)
+    (collect (list i j)))
 
   (iter (for i from 1 to 5)
-        (sum (* i i)))
+    (for j from 1 to i)
+    (collect (list i j))) &&&
 
-                                          ; Iterating over a hash table:
-  (let ((ht (make-hash-table)))
-    (setf (gethash 'a ht) 1
-          (gethash 'b ht) 2
-          (gethash 'c ht) 3)
-    (iterate (for (k v) in-hashtable ht)
-             (collect (list k v))))
-                                          ; => ((C 3) (B 2) (A 1))
+  ;; Early termination:
+  (iter (for i from 1)
+    (while (< i 5))
+    (collect i))
 
-                                          ; Nested iteration:
-  (iter (for i from 1 to 3)
-           (collect (iterate (for j from 1 to i)
-                             (collect j))))
-                                          ; => ((1) (1 2) (1 2 3))
+                                            ; Simple iteration over a range:
+    (iter (for i from 1 to 10)
+      (sum i))
+
+                                            ; Simple iteration over a list:
+    (iter (for x in '(1 2 3 4 5))
+      (sum x))
+
+                                            ; Iterating over a range of numbers:
+    (iter (for i from 1 to 5)
+      (collect (* i i)))
+
+    (iter (for i from 1 to 5)
+      (sum (* i i)))
+
+                                            ; Iterating over a hash table:
+    (let ((ht (make-hash-table)))
+      (setf (gethash 'a ht) 1
+            (gethash 'b ht) 2
+            (gethash 'c ht) 3)
+      (iterate (for (k v) in-hashtable ht)
+        (collect (list k v))))
+                                            ; => ((C 3) (B 2) (A 1))
+
+                                            ; Nested iteration:
+    (iter (for i from 1 to 3)
+      (collect (iterate (for j from 1 to i)
+                 (collect j))))
+                                            ; => ((1) (1 2) (1 2 3))
 #+end_src
 
 ** event scheduling
@@ -894,46 +1647,47 @@ https://iterate.common-lisp.dev
 
 *** clerk
 
-#+begin_src
-(ql:quickload :clerk)
-(use-package :clerk)
+#+begin_src lisp
+  (ql:quickload :clerk)
+  (use-package :clerk)
 
-;; Make sure your jobs are loaded before executing (clerk:start)
-(clerk:job "Say 'Hello' often" every 5.seconds (print "Hello"))
-(clerk:start)
-(clerk:stop)
+  ;; Make sure your jobs are loaded before executing (clerk:start)
+  ;; &&&verify
+  (clerk:job "Say 'Hello' often" every 5.seconds (print "Hello"))
+  (clerk:start)
+  (clerk:stop)
 
-(defun bark ()
-  (print "Bark!"))
+  (defun bark ()
+    (print "Bark!"))
 
-(clerk:job "The dog barks" every 7.seconds (bark))
-(clerk:start)
-(clerk:stop)
+  (clerk:job "The dog barks" every 7.seconds (bark))
+  (clerk:start)
+  (clerk:stop)
 
-;; The jobs reside inside clerk:*jobs*,
-(dolist (j clerk:*jobs*)
-  (print j))
-;; list of all scheduled and running jobs.
-(clerk:calendar)
+  ;; The jobs reside inside clerk:*jobs*,
+  (dolist (j clerk:*jobs*)
+    (print j))
+  ;; list of all scheduled and running jobs.
+  (clerk:calendar)
 
-(clerk:empty-jobs-queue)
-(clerk:calendar)
+  (clerk:empty-jobs-queue)
+  (clerk:calendar)
 
-;; all examples above are continuous jobs, set with every
-;; one time jobs are also available
-;; use in  or after to set one time jobs
-(clerk:job "Say 'Hello' often" every 5.seconds (print "Hello"))
-(clerk:start)
-(clerk:job "Bark once" in 15.seconds (bark))
-(clerk:calendar)
-(clerk:stop)
-(clerk:empty-jobs-queue)
+  ;; all examples above are continuous jobs, set with every
+  ;; one time jobs are also available
+  ;; use in  or after to set one time jobs
+  (clerk:job "Say 'Hello' often" every 5.seconds (print "Hello"))
+  (clerk:start)
+  (clerk:job "Bark once" in 15.seconds (bark))
+  (clerk:calendar)
+  (clerk:stop)
+  (clerk:empty-jobs-queue)
 
-;;programmatic setup
-(defparameter *query-interval* 30)
-(clerk:job-function (format nil "Task set for every: ~A seconds" *query-interval*)
-                    'every `(,*query-interval* seconds)
-                    #'bark) ; requires a function symbol or lambda
+  ;;programmatic setup
+  (defparameter *query-interval* 30)
+  (clerk:job-function (format nil "Task set for every: ~A seconds" *query-interval*)
+                      'every `(,*query-interval* seconds)
+                      #'bark) ; requires a function symbol or lambda
 #+end_src
 
 Intervals
