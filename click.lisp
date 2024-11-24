@@ -170,13 +170,11 @@ type lets you drill down to a specific help type
 eg system-apropos, describe"
   (print "not implemented"))
 
-(defun p (str &key (:p nil ) (:t "A" ))
+(defun p (str)
   "TODO fast and simple printing utility
 takes a string like: The (quick) brown (fox)
 substitutes the inline parens to a format statement of the type specified
 evaluates the format statement
-if :p is nil then the evaluated string is returned from the pf form. ie. it is the second format arg
-if :t is set to X then the format operator is ~X
 "(&&&))
 
 ;; Commands are listed in priority order. The headings are moved down as work is completed
@@ -247,8 +245,10 @@ files: (uiop:directory-files (uiop:getcwd))"
       (loop for line in (last lines n)
             do (format t "~A~%" line)))))
 
+#|
 ;;;; ==================================== end of evaluated code
-(exit)
+
+
 ;; Commands are listed in priority order. The headings are moved down as work is completed
 
 
@@ -259,7 +259,8 @@ files: (uiop:directory-files (uiop:getcwd))"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; scratch
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; reference
-
+How to clear repl to initial state
+#+(or) for code isolation to prevent evaluation
 
 ;;;; ==================================== bash rough implementation
 ;; The command is implemented to provide simple function. Use at your own risk and test as you go.
@@ -411,4 +412,6 @@ uname
 ;;;; =================================== nushell planned
 
 oh maybe all of it?
-Just the raddest bits of nushell, the danger of even considering implementing nushell in CL is like sirens calling me.
+Just the raddest bits of nushell the danger of even considering implementing nushell in CL is like sirens calling me.
+
+|#
