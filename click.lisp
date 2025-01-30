@@ -67,7 +67,10 @@
 
 (defun on-start ()
   "&&& everything that should happen every startup"
-  (quicklisp:update-all-dists :prompt nil)
+  (quicklisp:update-dist "quicklisp")
+  ;;&&& error (quicklisp:update-dist "ultralisp")
+  ;; (quicklisp:update-all-dists :prompt nil)
+
   ;; &&& start clerk
   ;; &&& clerk jobs
   ;; locations complementary to  *default-pathname-defaults*
@@ -259,6 +262,7 @@ files: (uiop:directory-files (uiop:getcwd))"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; scratch
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; reference
+
 How to clear repl to initial state
 #+(or) for code isolation to prevent evaluation
 

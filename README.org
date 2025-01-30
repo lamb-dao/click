@@ -500,6 +500,7 @@ recur predicates
 
   ;; predicates AND
   (finder* :predicates (list (name~ "test")
+                             (complement (path~ "exclude"))
                              (extension= "txt"))
            :root "/home/user/Downloads")
 
@@ -1383,24 +1384,74 @@ https://github.com/ruricolist/cmd
 
 #+end_src
 
-** py4cl
+** py4cl2
+
 Calls to and imports from Python
 https://github.com/digikar99/py4cl2
+
 #+begin_src lisp
-                                          ; Load
-  (ql:quickload :py4cl)
 
-                                          ; test setup finds python on path
-  (py4cl:python-version-info) ; fails if python command is not resolved in system
-  (print py4cl:*python-command*)
-  (setf py4cl:*python-command* "python3")
-  (py4cl:python-version-info)
-  (py4cl:import-module "math")
-  (py4cl:python-eval "math.pi")
+  (ql:quickload :py4cl2)
+  (use-package :py4cl2)
 
-                                          ; &&&usage
-  (py4cl:import-module "numpy" :as "np")
-  (py4cl:python-eval "[i**2 for i in range(5)]") ; => #(0 1 4 9 16)
+                                          ; first time manually initialize
+  ;; (py4cl2:initialize)
+  ;; ;; python3, ret, ret, ret
+  ;; (print py4cl2:*config*)
+  ;; (setf (config-var pycmd) "python3") ; set one field
+
+                                          ; test if pycmd finds python on path
+  (py4cl2:pyversion-info)    ; fails if python command is not resolved
+
+                                          ; test usage
+  (py4cl2:pyexec "print(\"hello\")")    ; => hello
+  (py4cl2:defpymodule "math")
+  (py4cl2:pyeval "math.pi")             ; 3.1415...
+  (py4cl2:defpymodule "numpy" nil :lisp-package "NP")
+  (np:floor 4.2)                        ; => 4.0
+  (py4cl2:pyeval "[i**2 for i in range(5)]")
+
+                                          ; import and environment
+  (defpymodule "os" nil :lisp-package "OS")
+  (defpymodule "sys" nil :lisp-package "SYS")
+  (defpymodule "pprint" nil :lisp-package "PPRINT")
+  (pyexec "sys.path.append('/home/user/code/dircontainingscript')")
+  (pyexec "sys.path.append('/home/user/.local/lib/python3.10/site-packages')")
+  (pyexec "sys.path.append('/home/user/.guix-profile/lib/python3.10/site-packages')")
+  ;; check python path contains target and path to imported modules
+  (pyexec "pprint.pprint(sys.path)")
+  (os:getcwd)
+  (os:listdir)
+
+                                          ; test setup
+  ;; NOTE: files on path cannot have '-' in them or defpymodule fails, with NIL!!!
+  ;; NOTE: If the file has a compilation error, then import will return NIL!!!
+  ;; NOTE: unresolved module import is one such silent failure mode.
+  ;; create pytest.py on python path which contains the following.
+  ;; ======================================
+  ;; def test():
+  ;;     print("test sucessfull")
+
+  ;; def argument(a):
+  ;;     print(a)
+
+  ;; def math(x):
+  ;;   y = x * x
+  ;;   return y
+  ;; ======================================
+
+                                          ; test import script on path
+  (defpymodule "pytest" nil :lisp-package "PYTEST")
+  (pytest:test)
+  (pytest:argument :a "hello")
+  (pytest:argument :a 42)
+  (pytest:math :x 9)
+  ;; must stop and restart to re import with changes
+
+                                          ; stop
+  (py4cl2:pystop)
+  (py4cl2:python-alive-p)
+
 #+end_src
 
 ** Clesh
