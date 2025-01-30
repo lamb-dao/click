@@ -56,6 +56,8 @@
    :find-dir
    :on-start
    :on-project
+   :touch ; &&& add to docs
+   :move-file ; &&& add to docs
    :*default-pathname-initialized*
    :*default-pathname-project*
    ))
@@ -211,6 +213,7 @@ files: (uiop:directory-files (uiop:getcwd))"
 
 (defun cd (&optional path)
   "Change directory. Defaults to ~"
+;; &&& cd etc should acccept #P
   (let ((target-path (cond
                        ((null path)(user-homedir-pathname))
                        ((string= path "..")(uiop:pathname-parent-directory-pathname (uiop:getcwd)))
@@ -218,7 +221,7 @@ files: (uiop:directory-files (uiop:getcwd))"
                        (t path))))
     ;; &&& could test if target-path exists
     (uiop:chdir target-path)
-    (setf *default-pathname-defaults* (pwd)) ;lock in
+    (setf *default-pathname-defaults* (uiop:getcwd)) ;lock in
     (pwd)))
 
 (defun which (command)
@@ -248,7 +251,34 @@ files: (uiop:directory-files (uiop:getcwd))"
       (loop for line in (last lines n)
             do (format t "~A~%" line)))))
 
-#|
+(defun touch (filename)
+  "In current wd! Create a new empty file or update the timestamp of an existing file"
+  ;; &&& make location independent, ie take pathnames or string for here
+  (let ((target-file (merge-pathnames (pathname filename) (uiop:getcwd))))
+    (with-open-file (stream target-file
+                            :direction :output
+                            :if-exists :append
+                            :if-does-not-exist :create)
+      ;; add nothing to the file
+      (declare (ignore stream)))
+    (probe-file filename)))
+
+(defun move-file (file target-dir)
+  "Move a file, using pathname substitution subset of rename-file, returns a path to the new location."
+  (let ((file-found (probe-file file))
+        (target-dir-found (probe-file target-dir)))
+    (unless file-found
+      (error "Cannot move file~%~A~%File does not exist." (namestring file)))
+    (unless target-dir-found
+      (error "Cannot move file to target-dir~%~A~%Target does not exist." (namestring target-dir)))
+
+    (rename-file file-found
+                 (make-pathname :defaults file-found
+                                :directory (pathname-directory target-dir-found)))
+    (probe-file (make-pathname :defaults file-found
+                               :directory (pathname-directory target-dir-found)))))
+
+;;#|
 ;;;; ==================================== end of evaluated code
 
 
@@ -259,6 +289,15 @@ files: (uiop:directory-files (uiop:getcwd))"
 ;;;; =================================== active construction
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; build
 
+;; cd etc should acccept #P
+;; slime has a docs page that should be in click docs
+
+
+;; rename file variations
+(rename-file #P"baaaa" (make-pathname :type "txt"))
+;; delete file
+(delete-file <file>)
+(ensure-directories-exist #P"/home/user/temp/lower/")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; scratch
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; reference
@@ -301,14 +340,6 @@ TODO Not recursive. Only files"
           (format t "File '~A' copied to '~A' successfully.~%" source destination))
         (format t "Source file '~A' not found.~%" source))))
 
-(defun touch (filename)
-  "Create a new empty file or update the timestamp of an existing file"
-  (let ((target-file (merge-pathnames (pathname filename) (pwd))))
-    (if (probe-file target-file)
-                                        ;&&& (uiop:touch-file target-file)
-        (with-open-file (stream target-file :direction :output :if-does-not-exist :create)
-          (declare (ignore stream))))
-    (format t "Touched file: ~A~%" filename)))
 
 (defun rmdir (dirname)
   "Remove an empty directory if it exists in the current working directory"
