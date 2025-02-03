@@ -1386,7 +1386,7 @@ https://github.com/ruricolist/cmd
 
 ** py4cl2
 
-Calls to and imports from Python
+Python interop
 https://github.com/digikar99/py4cl2
 
 #+begin_src lisp
