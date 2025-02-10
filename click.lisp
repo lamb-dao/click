@@ -69,7 +69,7 @@
 
 (defun on-start ()
   "&&& everything that should happen every startup"
-  (quicklisp:update-dist "quicklisp")
+  ;;(quicklisp:update-dist "quicklisp")
   ;;&&& error (quicklisp:update-dist "ultralisp")
   ;; (quicklisp:update-all-dists :prompt nil)
 
